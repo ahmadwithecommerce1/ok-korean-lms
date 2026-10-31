@@ -1,0 +1,6 @@
+{
+  "name": "OK Korean Language Center",
+  "description": "Premium enterprise academy management portal for OK Korean Language Center with Student Directory, Attendance, Weekly & Monthly Reports, PKR Tuition Ledger & Teacher Permissions Portal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
