@@ -1,0 +1,1015 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-korean: "Noto Sans KR", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+:root {
+  font-family: "Plus Jakarta Sans", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+
+body {
+  background-color: #0a0e1a;
+  color: #f8fafc;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+.light {
+  color-scheme: light;
+}
+
+/* ========================================================================= */
+/* CLEAN, STATIC & ULTRA-PREMIUM CARDS (MODERN GLASSMORPHISM & CRISP BORDERS) */
+/* ========================================================================= */
+
+.glow-card-wrapper {
+  position: relative;
+  border-radius: 1.25rem;
+  border: 1px solid var(--theme-border, rgba(51, 65, 85, 0.45));
+  background-color: var(--theme-card-bg, rgba(15, 23, 42, 0.9));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 20px -2px var(--theme-glow-shadow, rgba(0, 0, 0, 0.08));
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  overflow: hidden;
+}
+
+.glow-card-wrapper:hover {
+  border-color: var(--theme-primary, #06b6d4);
+  box-shadow: 0 10px 25px -4px var(--theme-glow-shadow, rgba(6, 182, 212, 0.2));
+  transform: translateY(-2px);
+}
+
+.glow-card-inner {
+  position: relative;
+  border-radius: 1.25rem;
+  color: var(--theme-text, #f8fafc);
+  height: 100%;
+  width: 100%;
+  transition: color 0.2s ease;
+}
+
+/* Rounded-3xl variant for Hero / Welcome banner */
+.glow-card-wrapper-3xl {
+  border-radius: 1.75rem;
+}
+
+.glow-card-wrapper-3xl .glow-card-inner {
+  border-radius: 1.75rem;
+}
+
+
+/* Base typography scaling from Theme Settings */
+html[data-font-size="small"] {
+  font-size: 14px;
+}
+
+html[data-font-size="medium"] {
+  font-size: 16px;
+}
+
+html[data-font-size="large"] {
+  font-size: 18px;
+}
+
+/* High Contrast Mode for superior accessibility */
+html.high-contrast {
+  filter: contrast(115%);
+}
+
+/* Custom scrollbars for clean modern SaaS feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes floatParticle {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 0.9;
+  }
+}
+
+.animate-particle {
+  animation: floatParticle 6s ease-in-out infinite;
+}
+
+/* Continuous Gradient Color Shift */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradientShift 4s ease infinite;
+}
+
+/* Floating animation for feature cards */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: floatSlow 4.5s ease-in-out infinite;
+}
+
+/* Continuous shimmer / shine sweep for button */
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+.animate-shimmer-sweep {
+  animation: shimmerSweep 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Rotating glow halo */
+@keyframes spinGlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-glow {
+  animation: spinGlow 12s linear infinite;
+}
+
+/* Subtle repeating fade-in / fade-out for subtitle */
+@keyframes subtleFade {
+  0%, 100% {
+    opacity: 0.95;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(1px);
+  }
+}
+
+.animate-subtle-fade {
+  animation: subtleFade 4.5s ease-in-out infinite;
+}
+
+/* Animated mesh gradient orbs */
+@keyframes meshOrb1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(35px, -25px) scale(1.15);
+    opacity: 0.55;
+  }
+}
+
+@keyframes meshOrb2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translate(-30px, 30px) scale(1.2);
+    opacity: 0.45;
+  }
+}
+
+.animate-mesh-1 {
+  animation: meshOrb1 8s ease-in-out infinite;
+}
+
+.animate-mesh-2 {
+  animation: meshOrb2 10s ease-in-out infinite;
+}
+
+/* Animated Thin Neon Border & Color-Shifting Glow */
+@keyframes neonGlowShift {
+  0%, 100% {
+    border-color: rgba(168, 85, 247, 0.95); /* Bright Purple */
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.45), 0 0 30px rgba(168, 85, 247, 0.2), inset 0 0 12px rgba(168, 85, 247, 0.08);
+  }
+  33% {
+    border-color: rgba(6, 182, 212, 0.95); /* Bright Cyan */
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.45), 0 0 30px rgba(6, 182, 212, 0.2), inset 0 0 12px rgba(6, 182, 212, 0.08);
+  }
+  66% {
+    border-color: rgba(236, 72, 153, 0.95); /* Bright Pink */
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.45), 0 0 30px rgba(236, 72, 153, 0.2), inset 0 0 12px rgba(236, 72, 153, 0.08);
+  }
+}
+
+.animate-neon-glow {
+  animation: neonGlowShift 4s ease-in-out infinite;
+}
+
+/* Premium Shiny Sweep Animation across text */
+@keyframes textShinySweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shiny-sweep {
+  background: linear-gradient(110deg, #9333ea 0%, #ec4899 28%, #ffffff 50%, #f472b6 72%, #7e22ce 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: textShinySweep 3.5s ease-in-out infinite;
+  display: inline-block;
+  text-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
+}
+
+/* ========================================================================= */
+/* FUTURISTIC BACKGROUND ANIMATIONS & GLASSMORPHIC GLOWS */
+/* ========================================================================= */
+
+@keyframes slowCosmosFloating {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(360deg);
+  }
+}
+
+.animate-cosmos {
+  animation: slowCosmosFloating 25s ease-in-out infinite;
+}
+
+@keyframes slowPulseGrid {
+  0%, 100% {
+    opacity: 0.035;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.08;
+    transform: scale(1.02);
+  }
+}
+
+.animate-pulse-grid {
+  animation: slowPulseGrid 18s ease-in-out infinite;
+}
+
+@keyframes loginBoxGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(147, 51, 234, 0.35), 0 0 55px rgba(59, 130, 246, 0.2), inset 0 0 15px rgba(147, 51, 234, 0.08);
+    border-color: rgba(168, 85, 247, 0.65);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(59, 130, 246, 0.45), 0 0 75px rgba(147, 51, 234, 0.25), inset 0 0 20px rgba(59, 130, 246, 0.12);
+    border-color: rgba(96, 165, 250, 0.75);
+  }
+}
+
+.animate-login-box-glow {
+  animation: loginBoxGlowPulse 8s ease-in-out infinite;
+}
+
+@keyframes shinyButtonShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-shiny-btn {
+  background-size: 200% 200%;
+  animation: shinyButtonShift 4s ease infinite;
+}
+
+/* 3D Tilt Card effect */
+.card-3d-tilt {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-3d-tilt:hover {
+  transform: perspective(1000px) rotateX(3deg) rotateY(-3deg) translateY(-4px);
+}
+
+/* Rotating Gradient Border for Glassmorphic Login Box */
+@keyframes rotateLoginBorder {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.login-rotating-border-wrap {
+  position: relative;
+  border-radius: 1.75rem;
+  padding: 1.5px;
+  overflow: hidden;
+  box-shadow: 0 0 50px -10px rgba(168, 85, 247, 0.4), 0 0 80px -20px rgba(6, 182, 212, 0.35);
+}
+
+.login-rotating-border-wrap::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    #a855f7 0%,
+    #06b6d4 25%,
+    #3b82f6 50%,
+    #ec4899 75%,
+    #a855f7 100%
+  );
+  animation: rotateLoginBorder 9s linear infinite;
+}
+
+.login-glass-content {
+  position: relative;
+  border-radius: calc(1.75rem - 1.5px);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  z-index: 10;
+}
+
+/* Floating Gradient Blobs (Purple & Cyan) */
+@keyframes floatBlobPurple {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(45px, -35px) scale(1.15);
+  }
+  66% {
+    transform: translate(-30px, 25px) scale(0.95);
+  }
+}
+
+@keyframes floatBlobCyan {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-40px, 40px) scale(1.1);
+  }
+  66% {
+    transform: translate(35px, -20px) scale(1.05);
+  }
+}
+
+.animate-blob-purple {
+  animation: floatBlobPurple 16s ease-in-out infinite;
+}
+
+.animate-blob-cyan {
+  animation: floatBlobCyan 18s ease-in-out infinite;
+}
+
+/* Staggered slide up & fade in */
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up-fade {
+  animation: slideUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Typewriter blinking cursor */
+@keyframes cursorBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-cursor-blink {
+  animation: cursorBlink 0.85s step-start infinite;
+}
+
+/* Feature card 3D tilt with interactive glow */
+.feature-card-tilt {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.feature-card-tilt:hover {
+  transform: perspective(1000px) rotateX(4deg) rotateY(-4deg) translateY(-5px);
+  box-shadow: 0 14px 35px -6px rgba(168, 85, 247, 0.35), 0 0 25px rgba(6, 182, 212, 0.25);
+  border-color: rgba(6, 182, 212, 0.7);
+}
+
+/* ========================================================================= */
+/* ELEGANT AURORA GRADIENT & CONTINUOUS GLOW ANIMATIONS                      */
+/* ========================================================================= */
+
+@keyframes auroraFloat1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.25;
+  }
+  33% {
+    transform: translate(60px, -45px) scale(1.2);
+    opacity: 0.45;
+  }
+  66% {
+    transform: translate(-40px, 35px) scale(0.9);
+    opacity: 0.3;
+  }
+}
+
+@keyframes auroraFloat2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.22;
+  }
+  33% {
+    transform: translate(-50px, 50px) scale(1.15);
+    opacity: 0.4;
+  }
+  66% {
+    transform: translate(45px, -30px) scale(0.95);
+    opacity: 0.28;
+  }
+}
+
+@keyframes auroraFloat3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.18;
+  }
+  50% {
+    transform: translate(30px, 30px) scale(1.25);
+    opacity: 0.35;
+  }
+}
+
+.animate-aurora-1 {
+  animation: auroraFloat1 24s ease-in-out infinite;
+}
+
+.animate-aurora-2 {
+  animation: auroraFloat2 28s ease-in-out infinite;
+}
+
+.animate-aurora-3 {
+  animation: auroraFloat3 32s ease-in-out infinite;
+}
+
+/* Continuous Text Shimmer Wave */
+@keyframes textShimmerWave {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-text-shimmer {
+  background-size: 200% auto;
+  animation: textShimmerWave 7s ease-in-out infinite;
+}
+
+/* Gentle floating animation for login card */
+@keyframes gentleFloatBox {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+.animate-gentle-float {
+  animation: gentleFloatBox 6.5s ease-in-out infinite;
+}
+
+/* Subtle glowing pulse border animation for active input fields */
+@keyframes inputGlowPulse {
+  0%, 100% {
+    border-color: rgba(168, 85, 247, 0.7);
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.4), inset 0 0 8px rgba(168, 85, 247, 0.12);
+  }
+  50% {
+    border-color: rgba(6, 182, 212, 0.85);
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), inset 0 0 12px rgba(6, 182, 212, 0.18);
+  }
+}
+
+.animate-input-glow {
+  animation: inputGlowPulse 2.8s ease-in-out infinite;
+}
+
+/* Continuous slow-moving glowing border for Welcome Banner */
+@keyframes bannerGlowBorder {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.35), inset 0 0 18px rgba(168, 85, 247, 0.08);
+    border-color: rgba(168, 85, 247, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(6, 182, 212, 0.45), inset 0 0 25px rgba(6, 182, 212, 0.14);
+    border-color: rgba(6, 182, 212, 0.75);
+  }
+}
+
+.animate-banner-border-glow {
+  animation: bannerGlowBorder 6s ease-in-out infinite;
+}
+
+/* Smooth continuous pulse animation for stats card glowing icons */
+@keyframes iconPulseSubtle {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.25);
+  }
+}
+
+.animate-icon-pulse {
+  animation: iconPulseSubtle 3.2s ease-in-out infinite;
+}
+
+/* Stats card hover scaling and brighter border glow */
+.stat-card-interactive:hover {
+  transform: translateY(-6px) scale(1.025);
+}
+
+/* ========================================================================= */
+/* CONTINUOUS TEXT LIGHT SWEEP & NEBULA MESH ANIMATIONS                      */
+/* ========================================================================= */
+
+@keyframes textLightSweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-light-sweep {
+  background: linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #e2e8f0 20%,
+    #cbd5e1 35%,
+    #67e8f9 48%,
+    #ffffff 52%,
+    #c084fc 65%,
+    #e2e8f0 80%,
+    #ffffff 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: textLightSweep 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  display: inline-block;
+}
+
+/* Continuous smooth glowing light sweep over solid bright white text in an infinite loop */
+@keyframes pureWhiteLightSweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-white-shimmer {
+  background: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #ffffff 35%,
+    #cbd5e1 44%,
+    #ffffff 50%,
+    #cbd5e1 56%,
+    #ffffff 65%,
+    #ffffff 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: pureWhiteLightSweep 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  display: inline-block;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.45));
+}
+
+/* Continuous smooth glowing light sweep (Cyan to Purple) passing across text in an infinite loop */
+@keyframes cyanPurpleLightSweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-cyan-purple-sweep {
+  background: linear-gradient(
+    115deg,
+    #a855f7 0%,
+    #818cf8 16%,
+    #22d3ee 34%,
+    #ffffff 50%,
+    #38bdf8 64%,
+    #c084fc 82%,
+    #a855f7 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: cyanPurpleLightSweep 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  display: inline-block;
+  filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.35)) drop-shadow(0 0 15px rgba(6, 182, 212, 0.3));
+}
+
+/* Continuous slow-pulsing glowing border around Login Box (Purple / Cyan) */
+@keyframes loginBoxPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 35px rgba(168, 85, 247, 0.4), 0 0 65px rgba(6, 182, 212, 0.2), inset 0 0 20px rgba(168, 85, 247, 0.08);
+    border-color: rgba(168, 85, 247, 0.65);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(6, 182, 212, 0.5), 0 0 85px rgba(168, 85, 247, 0.25), inset 0 0 25px rgba(6, 182, 212, 0.12);
+    border-color: rgba(6, 182, 212, 0.75);
+  }
+}
+
+.animate-login-border-glow {
+  animation: loginBoxPulseGlow 6s ease-in-out infinite;
+}
+
+/* Continuous gradient shimmer for Teacher Welcome Banner */
+@keyframes teacherTextShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-teacher-shimmer {
+  background: linear-gradient(
+    90deg,
+    #22d3ee 0%,
+    #818cf8 25%,
+    #c084fc 50%,
+    #22d3ee 75%,
+    #818cf8 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: teacherTextShimmer 3.8s ease-in-out infinite;
+}
+
+/* Slow-moving deep nebula mesh drift */
+@keyframes nebulaDrift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-nebula-mesh {
+  background-size: 200% 200%;
+  animation: nebulaDrift 22s ease-in-out infinite;
+}
+
+/* Slow floating glowing particle drift */
+@keyframes slowParticleFloat {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translateY(-28px) translateX(14px);
+    opacity: 0.85;
+  }
+}
+
+.animate-particle-drift {
+  animation: slowParticleFloat ease-in-out infinite;
+}
+
+/* Smooth Marquee Text Scrolling for Teacher Welcome Broadcast */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marqueeScroll 20s linear infinite;
+}
+
+.animate-marquee-medium {
+  display: inline-block;
+  animation: marqueeScroll 20s linear infinite;
+}
+
+.animate-marquee-slow {
+  display: inline-block;
+  animation: marqueeScroll 38s linear infinite;
+}
+
+.animate-marquee-very-slow {
+  display: inline-block;
+  animation: marqueeScroll 60s linear infinite;
+}
+
+.animate-marquee-very-very-slow,
+.animate-marquee-ultra-slow {
+  display: inline-block;
+  animation: marqueeScroll 90s linear infinite;
+}
+
+.animate-marquee-glacial {
+  display: inline-block;
+  animation: marqueeScroll 120s linear infinite;
+}
+
+.animate-marquee-high {
+  display: inline-block;
+  animation: marqueeScroll 10s linear infinite;
+}
+
+.animate-marquee-fast {
+  display: inline-block;
+  animation: marqueeScroll 5s linear infinite;
+}
+
+/* Sleek Glowing Amber/Orange Alert Card Border */
+@keyframes amberAlertGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.25), inset 0 0 15px rgba(245, 158, 11, 0.06);
+    border-color: rgba(245, 158, 11, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(249, 115, 22, 0.45), inset 0 0 25px rgba(249, 115, 22, 0.12);
+    border-color: rgba(249, 115, 22, 0.85);
+  }
+}
+
+.animate-amber-alert-glow {
+  animation: amberAlertGlowPulse 4s ease-in-out infinite;
+}
+
+/* Clean modern enterprise hover for Stat Cards */
+.stat-card-3d {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card-3d:hover {
+  transform: translateY(-2px);
+}
+
+/* Vertical Rolling Text Container & Dropping Texts (No Brackets) */
+.content {
+  display: block;
+  font-family: inherit;
+  margin: 0;
+  padding: 4px 0;
+  overflow: visible;
+}
+
+.content__container,
+.dropping-texts {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  min-height: 2em;
+  height: auto;
+  padding: 4px 0;
+  margin: 0;
+  overflow: visible;
+}
+
+@media (min-width: 640px) {
+  .content__container,
+  .dropping-texts {
+    font-size: 1.875rem;
+    line-height: 1.4;
+    min-height: 2em;
+    padding: 6px 0;
+  }
+}
+
+.content__container__text {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding-right: 0.5rem;
+  color: #ffffff;
+  font-weight: 700;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.content__container__list {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin: 0;
+  padding: 2px 4px;
+  overflow: hidden;
+  height: 2em;
+  min-height: 2em;
+  line-height: 1.4;
+}
+
+.content__container__list__item {
+  height: 100%;
+  line-height: 1.4;
+  margin: 0;
+  padding: 2px 6px;
+  color: #ffffff;
+  font-weight: 700;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+@keyframes opacity {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes change {
+  0%, 20% {
+    transform: translate3d(0, 0%, 0);
+  }
+  25%, 45% {
+    transform: translate3d(0, -25%, 0);
+  }
+  50%, 70% {
+    transform: translate3d(0, -50%, 0);
+  }
+  75%, 95% {
+    transform: translate3d(0, -75%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0%, 0);
+  }
+}
+
+/* Continuous HSL Letter Color Wave */
+@keyframes letterColorWave {
+  0% {
+    color: hsl(0, 90%, 65%);
+  }
+  16.6% {
+    color: hsl(60, 90%, 60%);
+  }
+  33.3% {
+    color: hsl(120, 90%, 60%);
+  }
+  50% {
+    color: hsl(180, 90%, 62%);
+  }
+  66.6% {
+    color: hsl(240, 90%, 68%);
+  }
+  83.3% {
+    color: hsl(300, 90%, 65%);
+  }
+  100% {
+    color: hsl(360, 90%, 65%);
+  }
+}
+
+.color-anim-letter {
+  display: inline-block;
+  animation: letterColorWave 5s linear infinite;
+  will-change: color;
+  padding: 2px 0;
+  vertical-align: middle;
+}
