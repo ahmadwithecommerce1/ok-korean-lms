@@ -1,0 +1,2924 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OK Korean LMS — Teacher Activity Monitor &amp; Teacher Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Firebase App & Realtime Database Compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --bg-root: #09090b;
+      --bg-sidebar: #0c0c10;
+      --bg-card: #18181b;
+      --bg-card-hover: #1f1f24;
+      --bg-elevated: #121216;
+      --border-subtle: #27272a;
+      --border-strong: #3f3f46;
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.25);
+      --accent-red: #ef4444;
+      --accent-red-glow: rgba(239, 68, 68, 0.22);
+      --accent-yellow: #f59e0b;
+      --accent-yellow-glow: rgba(245, 158, 11, 0.22);
+      --accent-cyan: #06b6d4;
+      --accent-indigo: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--bg-root);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+    /* App Shell Layout */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(16, 185, 129, 0.06), transparent 36%),
+        radial-gradient(circle at 88% 8%, rgba(239, 68, 68, 0.04), transparent 32%),
+        var(--bg-root);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 268px;
+      flex-shrink: 0;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 40;
+      transition: transform 0.25s ease;
+    }
+
+    .sidebar-brand {
+      padding: 20px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(99, 102, 241, 0.2));
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-green);
+      font-size: 17px;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.2);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--accent-green);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      margin-top: 2px;
+    }
+
+    .sidebar-close-btn {
+      display: none;
+      background: #18181b;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 10px 6px;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-item-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .nav-item-btn:hover {
+      background-color: #18181b;
+      color: #ffffff;
+      border-color: #27272a;
+    }
+
+    .nav-item-btn.active {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.16), rgba(16, 185, 129, 0.04));
+      color: #ffffff;
+      border-color: rgba(16, 185, 129, 0.45);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.12);
+      font-weight: 600;
+    }
+
+    .nav-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .nav-item-btn.active i {
+      color: var(--accent-green);
+    }
+
+    .nav-badge-live {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .sidebar-footer {
+      padding: 14px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .role-switch-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .role-switch-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .role-switch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .role-btn {
+      padding: 7px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: #101014;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .role-btn.active-admin {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: var(--accent-green);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.18);
+    }
+
+    .role-btn.active-teacher {
+      background: rgba(99, 102, 241, 0.18);
+      border-color: rgba(99, 102, 241, 0.55);
+      color: #a5b4fc;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.18);
+    }
+
+    .new-tab-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px dashed var(--border-strong);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 11.5px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .new-tab-link:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.06);
+    }
+
+    /* Main Content Area */
+    .main-area {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .page-title-wrap h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .page-title-wrap p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .live-sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 11px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: var(--accent-green);
+      font-size: 11.5px;
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.18);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: pulseGlow 1.7s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(1.25); }
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .clock-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .clock-pill i {
+      color: var(--accent-green);
+    }
+
+    .content-container {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      max-width: 1520px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* 4 Stat Cards Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+    }
+
+    .stat-card.stat-online {
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: inset 0 1px 0 rgba(16, 185, 129, 0.25), 0 8px 28px rgba(16, 185, 129, 0.06);
+    }
+
+    .stat-card.stat-offline {
+      border-color: rgba(239, 68, 68, 0.35);
+      box-shadow: inset 0 1px 0 rgba(239, 68, 68, 0.22), 0 8px 28px rgba(239, 68, 68, 0.05);
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .stat-icon.green { background: rgba(16, 185, 129, 0.14); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .stat-icon.red { background: rgba(239, 68, 68, 0.14); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .stat-icon.cyan { background: rgba(6, 182, 212, 0.14); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
+    .stat-icon.indigo { background: rgba(99, 102, 241, 0.14); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Section Card Wrapper */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .panel-title i {
+      color: var(--accent-green);
+    }
+
+    .panel-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Live Faculty Presence Cards */
+    .faculty-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .faculty-card {
+      background: #121216;
+      border: 1px solid var(--border-subtle);
+      border-radius: 13px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.16s ease;
+    }
+
+    .faculty-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-strong);
+    }
+
+    .faculty-card.status-online { border-color: rgba(16, 185, 129, 0.4); }
+    .faculty-card.status-away { border-color: rgba(245, 158, 11, 0.42); }
+    .faculty-card.status-offline,
+    .faculty-card.status-tab-closed { border-color: rgba(239, 68, 68, 0.28); }
+
+    .faculty-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .faculty-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .faculty-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #27272a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #ffffff;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .presence-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 2px solid #121216;
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+    }
+
+    .dot-green {
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+    }
+
+    .dot-yellow {
+      background: var(--accent-yellow);
+      box-shadow: 0 0 10px var(--accent-yellow);
+    }
+
+    .dot-red {
+      background: var(--accent-red);
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+    }
+
+    .faculty-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .faculty-batch {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .faculty-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-secondary);
+      padding-top: 8px;
+      border-top: 1px solid #222227;
+    }
+
+    /* Status Pills */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill-online {
+      background: rgba(16, 185, 129, 0.14);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .pill-away {
+      background: rgba(245, 158, 11, 0.14);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .pill-offline {
+      background: rgba(239, 68, 68, 0.14);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .pill-tab-closed {
+      background: rgba(239, 68, 68, 0.16);
+      color: #fda4af;
+      border: 1px solid rgba(239, 68, 68, 0.42);
+    }
+
+    .inline-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .last-active-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .last-active-rel {
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--text-primary);
+    }
+
+    .last-active-exact {
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    /* Filters Bar */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #121216;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-input, .control-select {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-size: 12.5px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .control-input:focus, .control-select:focus {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 210px;
+    }
+
+    .search-wrap i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding-left: 34px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 13px;
+      border-radius: 9px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: #27272a;
+      border-color: var(--border-strong);
+    }
+
+    .btn.active-filter {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: var(--accent-green);
+    }
+
+    .btn-green {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+      color: #052e16;
+      font-weight: 700;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-green:hover {
+      background: #059669;
+      border-color: #059669;
+      color: #ffffff;
+    }
+
+    .btn-red {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #f87171;
+    }
+
+    .btn-red:hover {
+      background: var(--accent-red);
+      border-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    /* History Table */
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+    }
+
+    table.log-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    table.log-table thead {
+      background: #121216;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    table.log-table th {
+      padding: 13px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    table.log-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #202026;
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    table.log-table tbody tr {
+      transition: background-color 0.14s ease;
+    }
+
+    table.log-table tbody tr:hover {
+      background: #1f1f24;
+    }
+
+    table.log-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .teacher-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .mini-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #27272a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Teacher Portal Views */
+    .portal-center {
+      max-width: 980px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .login-card {
+      max-width: 520px;
+      margin: 24px auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .login-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: var(--accent-green);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+    }
+
+    .quick-teacher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      gap: 10px;
+      margin: 14px 0 18px;
+    }
+
+    .teacher-select-tile {
+      padding: 12px;
+      border-radius: 12px;
+      background: #121216;
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .teacher-select-tile:hover {
+      border-color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .teacher-select-tile.selected {
+      border-color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.14);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.18);
+    }
+
+    .tracker-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.13), #18181b 55%);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tracker-banner.state-away {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), #18181b 55%);
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .portal-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .event-log-box {
+      background: #101014;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .event-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: #18181b;
+      border: 1px solid #24242b;
+    }
+
+    /* Placeholder Module View for Other Sidebar Items */
+    .module-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: #18181b;
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #ffffff;
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      animation: slideUp 0.2s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Backdrop for mobile sidebar */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 35;
+    }
+
+    .sidebar-backdrop.open {
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1140px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .portal-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 880px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .mobile-menu-btn,
+      .sidebar-close-btn {
+        display: inline-flex;
+      }
+      .content-container {
+        padding: 16px;
+      }
+      .topbar {
+        padding: 14px 16px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .stats-grid,
+      .portal-metrics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+  <div class="app-shell">
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-left">
+          <div class="brand-logo">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <div class="brand-title">OK Korean LMS</div>
+            <div class="brand-subtitle">Activity Telemetry</div>
+          </div>
+        </div>
+        <button id="sidebarCloseBtn" class="sidebar-close-btn" type="button" aria-label="Close menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="LMS Navigation">
+        <div>
+          <div class="nav-section-label">Student Management</div>
+          <ul class="nav-list">
+            <li>
+              <button class="nav-item-btn" data-section="students" type="button">
+                <span class="nav-item-left"><i class="fa-solid fa-users"></i><span>Student Directory</span></span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-section="admissions" type="button">
+                <span class="nav-item-left"><i class="fa-solid fa-user-plus"></i><span>Admission Requests</span></span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-section="batches" type="button">
+                <span class="nav-item-left"><i class="fa-solid fa-layer-group"></i><span>Batch &amp; Classes</span></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-section-label">Staff Management</div>
+          <ul class="nav-list">
+            <li>
+              <button class="nav-item-btn active" data-section="monitor" type="button">
+                <span class="nav-item-left"><i class="fa-solid fa-desktop"></i><span>Teacher Monitor</span></span>
+                <span class="nav-badge-live">LIVE</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-section="teachers" type="button">
+                <span class="nav-item-left"><i class="fa-solid fa-chalkboard-user"></i><span>Teacher Management</span></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-section-label">Academic Management</div>
+          <ul class="nav-list">
+            <li>
+              <button class="nav-item-btn" data-section="attendance" type="button">
+                <span class="nav-item-left"><i class="fa-solid fa-calendar-check"></i><span>Daily Attendance</span></span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-section="tests" type="button">
+                <span class="nav-item-left"><i class="fa-solid fa-file-pen"></i><span>Weekly Tests</span></span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-section="materials" type="button">
+                <span class="nav-item-left"><i class="fa-solid fa-book-open"></i><span>Study Materials</span></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- Quick Portal Switcher & Multi-Tab Sync Link -->
+      <div class="sidebar-footer">
+        <div class="role-switch-card">
+          <div class="role-switch-title">Workspace Mode</div>
+          <div class="role-switch-grid">
+            <button id="switchAdminBtn" class="role-btn active-admin" type="button">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Admin Side</span>
+            </button>
+            <button id="switchTeacherBtn" class="role-btn" type="button">
+              <i class="fa-solid fa-user-tie"></i>
+              <span>Teacher Side</span>
+            </button>
+          </div>
+          <a id="openSeparateTabLink" class="new-tab-link" href="?mode=teacher" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>Open Teacher Tab for Live Sync</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Area -->
+    <div class="main-area">
+      <!-- Top Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Open menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-wrap">
+            <h1>
+              <span id="headerTitleText">Teacher Activity Monitor</span>
+              <span id="headerSyncBadge" class="live-sync-badge">
+                <span class="pulse-dot"></span>
+                <span>Live History Sync</span>
+              </span>
+            </h1>
+            <p id="headerSubtitleText">
+              Firebase Realtime Database Heartbeat (20s) + Timeout (&gt;60s) faculty presence &amp; session monitor
+            </p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="clock-pill font-mono">
+            <i class="fa-regular fa-clock"></i>
+            <span id="liveClockDisplay">--:--:--</span>
+          </div>
+          <button id="headerQuickToggleBtn" class="btn" type="button">
+            <i class="fa-solid fa-repeat"></i>
+            <span id="headerQuickToggleLabel">Switch to Teacher Portal</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Workspace Container -->
+      <main class="content-container">
+        <!-- ===================== ADMIN DASHBOARD VIEW ===================== -->
+        <section id="adminMonitorView">
+          <div style="display:flex; flex-direction:column; gap:22px;">
+            <!-- Top 4 Stat Cards -->
+            <div class="stats-grid">
+              <div class="stat-card stat-online">
+                <div class="stat-top">
+                  <span class="stat-label">ONLINE</span>
+                  <div class="stat-icon green"><i class="fa-solid fa-wifi"></i></div>
+                </div>
+                <div id="statOnlineCount" class="stat-value font-mono" style="color: var(--accent-green);">0</div>
+                <div class="stat-sub">
+                  <i class="fa-solid fa-circle-dot" style="color: var(--accent-green); font-size: 9px;"></i>
+                  <span>Active on LMS</span>
+                </div>
+              </div>
+
+              <div class="stat-card stat-offline">
+                <div class="stat-top">
+                  <span class="stat-label">OFFLINE</span>
+                  <div class="stat-icon red"><i class="fa-solid fa-power-off"></i></div>
+                </div>
+                <div id="statOfflineCount" class="stat-value font-mono" style="color: var(--accent-red);">0</div>
+                <div class="stat-sub">
+                  <i class="fa-solid fa-circle" style="color: var(--accent-red); font-size: 9px;"></i>
+                  <span id="statOfflineSubText">Faculty signed out</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-top">
+                  <span class="stat-label">SESSIONS</span>
+                  <div class="stat-icon cyan"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                </div>
+                <div id="statSessionsCount" class="stat-value font-mono">0</div>
+                <div class="stat-sub">
+                  <i class="fa-solid fa-database" style="color: var(--accent-cyan); font-size: 10px;"></i>
+                  <span>Total history logs</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-top">
+                  <span class="stat-label">REGISTERED TEACHERS</span>
+                  <div class="stat-icon indigo"><i class="fa-solid fa-users-gear"></i></div>
+                </div>
+                <div id="statRegisteredCount" class="stat-value font-mono">0</div>
+                <div class="stat-sub">
+                  <i class="fa-solid fa-id-badge" style="color: #818cf8; font-size: 10px;"></i>
+                  <span>Total accounts</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Faculty Presence Row -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">
+                    <i class="fa-solid fa-signal"></i>
+                    <span>Live Faculty Presence</span>
+                  </div>
+                  <div class="panel-subtitle">
+                    Green (&lt;30s heartbeat) = Online &middot; Yellow (&lt;60s) = Away &middot; Red (&gt;60s) = Offline (Timeout)
+                  </div>
+                </div>
+                <span id="awayCounterPill" class="status-pill pill-away hidden">
+                  <span class="inline-dot dot-yellow"></span>
+                  <span id="awayCounterText">0 Away</span>
+                </span>
+              </div>
+
+              <div id="liveFacultyGrid" class="faculty-grid"></div>
+            </div>
+
+            <!-- Historical Session Activity Log Panel -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Teacher Activity Monitor Log</span>
+                  </div>
+                  <div class="panel-subtitle">
+                    Live <code class="font-mono" style="color: var(--accent-green);">teachers_status</code> listener (<code class="font-mono">on('value')</code>) with 60s timeout guard
+                  </div>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button id="exportCsvBtn" class="btn" type="button">
+                    <i class="fa-solid fa-file-export"></i>
+                    <span>Export CSV</span>
+                  </button>
+                  <button id="resetDemoBtn" class="btn btn-red" type="button">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>Reset Demo Data</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Filters Bar -->
+              <div class="filters-bar">
+                <div class="filter-group">
+                  <input id="filterDateInput" type="date" class="control-input font-mono" aria-label="Filter by date" />
+                  <button id="filterTodayBtn" class="btn" type="button">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    <span>Today</span>
+                  </button>
+                  <button id="filterAllHistoryBtn" class="btn active-filter" type="button">
+                    <i class="fa-solid fa-infinity"></i>
+                    <span>All History</span>
+                  </button>
+                </div>
+
+                <div class="filter-group">
+                  <select id="filterStatusSelect" class="control-select" aria-label="Filter by status">
+                    <option value="All">Status: All</option>
+                    <option value="Online">Online</option>
+                    <option value="Away">Away</option>
+                    <option value="Tab Closed">Tab Closed</option>
+                    <option value="Offline">Offline</option>
+                  </select>
+                </div>
+
+                <div class="search-wrap">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input id="filterSearchInput" type="text" class="control-input" placeholder="Search by Teacher Name..." />
+                </div>
+              </div>
+
+              <!-- Activity Table -->
+              <div class="table-scroll">
+                <table class="log-table">
+                  <thead>
+                    <tr>
+                      <th>Teacher Name</th>
+                      <th>Date</th>
+                      <th>Login Time</th>
+                      <th>Logout Time</th>
+                      <th>Active Duration</th>
+                      <th>Last Active</th>
+                      <th>Current Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== OTHER SIDEBAR PLACEHOLDER VIEW ===================== -->
+        <section id="otherModuleView" class="hidden">
+          <div class="module-card">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h2 id="otherModuleTitle" style="font-size:18px; font-weight:800;">Module View</h2>
+                <p id="otherModuleDesc" style="font-size:13px; color:var(--text-secondary); margin-top:4px;"></p>
+              </div>
+              <button id="backToMonitorBtn" class="btn btn-green" type="button">
+                <i class="fa-solid fa-desktop"></i>
+                <span>Return to Teacher Monitor</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== TEACHER PORTAL VIEW ===================== -->
+        <section id="teacherPortalView" class="hidden">
+          <!-- Login Form (when no teacher signed in on this tab) -->
+          <div id="teacherLoginCard" class="login-card">
+            <div class="login-header">
+              <div class="login-icon">
+                <i class="fa-solid fa-chalkboard-user"></i>
+              </div>
+              <h2 style="font-size:20px; font-weight:800; letter-spacing:-0.02em;">Teacher Portal Sign-In</h2>
+              <p style="font-size:12.5px; color:var(--text-secondary); margin-top:5px;">
+                Select a faculty profile to start real-time browser visibility &amp; session telemetry.
+              </p>
+            </div>
+
+            <div style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;">
+              Registered Faculty Accounts
+            </div>
+            <div id="quickTeacherTiles" class="quick-teacher-grid"></div>
+
+            <form id="teacherLoginForm" style="display:flex; flex-direction:column; gap:12px;">
+              <div>
+                <label for="teacherNameInput" style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">
+                  Teacher Name
+                </label>
+                <input id="teacherNameInput" type="text" class="control-input" style="width:100%;" placeholder="e.g., Sir Faheem" required />
+              </div>
+
+              <button type="submit" class="btn btn-green" style="padding:11px 16px; font-size:13.5px; width:100%;">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>Start Session &amp; Enable Live Tracking</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Active Teacher Dashboard -->
+          <div id="teacherActiveDashboard" class="portal-center hidden">
+            <div id="trackerStatusBanner" class="tracker-banner">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div class="faculty-avatar" style="width:50px; height:50px; font-size:17px; border:1px solid rgba(16,185,129,0.45);">
+                  <span id="portalAvatarText">SF</span>
+                  <span id="portalPresenceDot" class="presence-dot dot-green"></span>
+                </div>
+                <div>
+                  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <h2 id="portalTeacherName" style="font-size:19px; font-weight:800;">Sir Faheem</h2>
+                    <span id="portalStatusPill" class="status-pill pill-online">
+                      <i class="fa-solid fa-circle-dot"></i>
+                      <span>Online</span>
+                    </span>
+                  </div>
+                  <p id="portalBatchSub" style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
+                    Tracking <code class="font-mono" style="color:var(--accent-green);">visibilitychange</code>, <code class="font-mono" style="color:var(--accent-green);">beforeunload</code> &amp; browser-session flags
+                  </p>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <a class="btn" href="?mode=admin" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+                  <i class="fa-solid fa-desktop" style="color:var(--accent-green);"></i>
+                  <span>Open Admin Monitor Tab</span>
+                </a>
+                <button id="teacherLogoutBtn" class="btn btn-red" type="button">
+                  <i class="fa-solid fa-right-from-bracket"></i>
+                  <span>Logout (Mark Offline)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Session Telemetry Cards -->
+            <div class="portal-metrics-grid">
+              <div class="stat-card stat-online">
+                <div class="stat-top">
+                  <span class="stat-label">LOGIN TIME</span>
+                  <div class="stat-icon green"><i class="fa-solid fa-clock"></i></div>
+                </div>
+                <div id="portalLoginTime" class="stat-value font-mono" style="font-size:24px;">--:--</div>
+                <div id="portalLoginDate" class="stat-sub font-mono">YYYY-MM-DD</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-top">
+                  <span class="stat-label">ACTIVE DURATION</span>
+                  <div class="stat-icon cyan"><i class="fa-solid fa-stopwatch"></i></div>
+                </div>
+                <div id="portalElapsedDuration" class="stat-value font-mono" style="font-size:24px; color:var(--accent-cyan);">0 secs</div>
+                <div class="stat-sub">Live elapsed session time</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-top">
+                  <span class="stat-label">HEARTBEAT &amp; VISIBILITY</span>
+                  <div class="stat-icon indigo"><i class="fa-solid fa-heart-pulse"></i></div>
+                </div>
+                <div id="portalVisibilityState" class="stat-value font-mono" style="font-size:24px; color:var(--accent-green);">visible</div>
+                <div id="portalHeartbeatSub" class="stat-sub">20s Firebase pulse active · Switches to Away when tab hidden</div>
+              </div>
+            </div>
+
+            <!-- Faculty Workspace & Live Telemetry Feed -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">
+                    <i class="fa-solid fa-wave-square"></i>
+                    <span>Browser Event Activity Stream</span>
+                  </div>
+                  <div class="panel-subtitle">
+                    Switch tabs to test <strong style="color:#fbbf24;">Away</strong>, close this tab for <strong style="color:#fda4af;">Tab Closed</strong>, or click Logout / close browser for <strong style="color:#f87171;">Offline</strong>.
+                  </div>
+                </div>
+                <span class="font-mono" style="font-size:11px; color:var(--text-muted);" id="portalTabIdLabel">Tab ID: --</span>
+              </div>
+
+              <div id="portalEventStream" class="event-log-box"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // FIREBASE REALTIME DATABASE CONFIG & HEARTBEAT / TIMEOUT CONSTANTS
+      // =========================================================================
+      var HEARTBEAT_INTERVAL_MS = 20000; // Send pulse every 20 seconds
+      var ONLINE_THRESHOLD_MS = 30000;   // Green dot (< 30s)
+      var TIMEOUT_THRESHOLD_MS = 60000;  // Offline (Timeout) (> 60s)
+
+      var firebaseConfig = {
+        apiKey: 'AIzaSyB7bfHpaV2njsvG95KSqnj1IH6AZCkzE9A',
+        authDomain: 'ok-lms-web-app.firebaseapp.com',
+        databaseURL: 'https://ok-lms-web-app-default-rtdb.firebaseio.com',
+        projectId: 'ok-lms-web-app',
+        storageBucket: 'ok-lms-web-app.firebasestorage.app',
+        messagingSenderId: '443194825966',
+        appId: '1:443194825966:web:e25e74040c4f489a7c67ff'
+      };
+
+      var rtdb = null;
+      var SERVER_TIMESTAMP = Date.now();
+      try {
+        if (window.firebase && typeof window.firebase.initializeApp === 'function') {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+          if (typeof firebase.database === 'function') {
+            rtdb = firebase.database();
+            SERVER_TIMESTAMP = firebase.database.ServerValue.TIMESTAMP;
+          }
+        }
+      } catch (fbErr) {
+        console.warn('Firebase RTDB init fallback to local mirror:', fbErr);
+        rtdb = null;
+      }
+
+      // Active Teacher Tracker state & listener refs (cleaned up on logout)
+      var activeTrackerState = {
+        teacherId: null,
+        statusRef: null,
+        heartbeatIntervalId: null,
+        visibilityHandler: null,
+        beforeUnloadHandler: null,
+        lastHeartbeatAtMs: null
+      };
+
+      // Live Admin snapshot cache from `db.ref('teachers_status').on('value', ...)`
+      var firebaseTeachersStatusMap = {};
+      var adminStatusRef = null;
+      var adminValueCallback = null;
+
+      // =========================================================================
+      // STORAGE KEYS & INITIAL FACULTY REGISTRY (LOCAL MIRROR / FALLBACK)
+      // =========================================================================
+      var KEYS = {
+        TEACHERS: 'lms_tam_registered_teachers_v1',
+        LIVE_STATUS: 'lms_tam_live_presence_v1',
+        HISTORY: 'teacher_activity_history',
+        OPEN_TABS: 'lms_tam_open_tabs_v1',
+        BROWSER_SESSION_ID: 'lms_tam_browser_session_id_v1',
+        PENDING_BROWSER_EXIT: 'lms_tam_pending_browser_exit_v1'
+      };
+
+      var SESSION_KEYS = {
+        TAB_ID: 'lms_tam_tab_id',
+        TEACHER_SESSION: 'lms_tam_active_teacher_session',
+        BROWSER_ALIVE: 'lms_tam_browser_alive'
+      };
+
+      var DEFAULT_TEACHERS = [
+        { id: 't_faheem', name: 'Sir Faheem', batch: 'Batch A · Morning TOPIK I', initials: 'SF' },
+        { id: 't_nabeela', name: 'Mam Nabeela', batch: 'Batch B · Morning Grammar', initials: 'MN' },
+        { id: 't_fakhar', name: 'Mam Fakhar', batch: 'Batch C · Evening Speaking', initials: 'MF' },
+        { id: 't_kamran', name: 'Sir Kamran', batch: 'Batch D · EPS Korean Prep', initials: 'SK' },
+        { id: 't_ayesha', name: 'Mam Ayesha', batch: 'Batch E · TOPIK II Writing', initials: 'MA' }
+      ];
+
+      // =========================================================================
+      // UTILITY HELPERS
+      // =========================================================================
+      function safeReadJSON(storage, key, fallback) {
+        try {
+          var raw = storage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (err) {
+          return fallback;
+        }
+      }
+
+      function safeWriteJSON(storage, key, value) {
+        try {
+          storage.setItem(key, JSON.stringify(value));
+        } catch (err) {
+          console.warn('Storage write warning:', err);
+        }
+      }
+
+      function getTodayDateString() {
+        var now = new Date();
+        var y = now.getFullYear();
+        var m = String(now.getMonth() + 1).padStart(2, '0');
+        var d = String(now.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + d;
+      }
+
+      function formatTime12h(dateObj) {
+        if (!dateObj) return '—';
+        var d = dateObj instanceof Date ? dateObj : new Date(dateObj);
+        if (isNaN(d.getTime())) return '—';
+        return d.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+      }
+
+      function formatRelativeLastActive(lastActiveMs, nowMs) {
+        if (!lastActiveMs || isNaN(lastActiveMs)) return 'Never';
+        var diffSec = Math.max(0, Math.floor(((nowMs || Date.now()) - lastActiveMs) / 1000));
+        if (diffSec < 5) return 'Just now';
+        if (diffSec < 60) return diffSec + (diffSec === 1 ? ' sec ago' : ' secs ago');
+        var mins = Math.floor(diffSec / 60);
+        if (mins < 60) return mins + (mins === 1 ? ' min ago' : ' mins ago');
+        var hours = Math.floor(mins / 60);
+        if (hours < 24) return hours + (hours === 1 ? ' hr ago' : ' hrs ago');
+        var days = Math.floor(hours / 24);
+        return days + (days === 1 ? ' day ago' : ' days ago');
+      }
+
+      function formatDurationHuman(ms) {
+        var totalSeconds = Math.max(0, Math.floor(ms / 1000));
+        if (totalSeconds < 60) {
+          return totalSeconds === 1 ? '1 sec' : totalSeconds + ' secs';
+        }
+        var totalMinutes = Math.floor(totalSeconds / 60);
+        if (totalMinutes < 60) {
+          return totalMinutes === 1 ? '1 min' : totalMinutes + ' mins';
+        }
+        var hours = Math.floor(totalMinutes / 60);
+        var remMins = totalMinutes % 60;
+        if (remMins === 0) return hours + (hours === 1 ? ' hr' : ' hrs');
+        return hours + ' hr ' + remMins + ' mins';
+      }
+
+      function computeInitials(name) {
+        var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+        if (parts.length === 0) return 'TC';
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function generateId(prefix) {
+        return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+      }
+
+      // =========================================================================
+      // DATABASE INITIALIZATION & SEEDING IN LOCALSTORAGE MIRROR
+      // =========================================================================
+      function ensureSeedData() {
+        var teachers = safeReadJSON(localStorage, KEYS.TEACHERS, null);
+        if (!Array.isArray(teachers) || teachers.length === 0) {
+          safeWriteJSON(localStorage, KEYS.TEACHERS, DEFAULT_TEACHERS);
+          teachers = DEFAULT_TEACHERS;
+        }
+
+        var presence = safeReadJSON(localStorage, KEYS.LIVE_STATUS, null);
+        if (!presence || typeof presence !== 'object') {
+          var initialPresence = {};
+          teachers.forEach(function (t) {
+            initialPresence[t.id] = {
+              teacherId: t.id,
+              teacher: t.name,
+              batch: t.batch,
+              status: 'offline',
+              login: '—',
+              date: getTodayDateString(),
+              last_active: Date.now() - 180000,
+              updatedAt: Date.now() - 180000
+            };
+          });
+          safeWriteJSON(localStorage, KEYS.LIVE_STATUS, initialPresence);
+        }
+
+        var history = safeReadJSON(localStorage, KEYS.HISTORY, null);
+        if (!Array.isArray(history)) {
+          var today = getTodayDateString();
+          var nowMs = Date.now();
+          var seedHistory = [
+            {
+              id: 'seed_1',
+              teacherId: 't_faheem',
+              teacher: 'Sir Faheem',
+              date: today,
+              login: '08:30 AM',
+              logout: '10:15 AM',
+              duration: '1 hr 45 mins',
+              last_active: nowMs - 120000,
+              status: 'offline'
+            },
+            {
+              id: 'seed_2',
+              teacherId: 't_nabeela',
+              teacher: 'Mam Nabeela',
+              date: today,
+              login: '09:00 AM',
+              logout: '10:30 AM',
+              duration: '1 hr 30 mins',
+              last_active: nowMs - 240000,
+              status: 'offline'
+            },
+            {
+              id: 'seed_3',
+              teacherId: 't_fakhar',
+              teacher: 'Mam Fakhar',
+              date: today,
+              login: '10:00 AM',
+              logout: '10:45 AM',
+              duration: '45 mins',
+              last_active: nowMs - 360000,
+              status: 'offline'
+            }
+          ];
+          safeWriteJSON(localStorage, KEYS.HISTORY, seedHistory);
+        }
+      }
+
+      // =========================================================================
+      // TAB ID & STATE REFS
+      // =========================================================================
+      var TAB_ID = sessionStorage.getItem(SESSION_KEYS.TAB_ID);
+      if (!TAB_ID) {
+        TAB_ID = generateId('tab');
+        sessionStorage.setItem(SESSION_KEYS.TAB_ID, TAB_ID);
+      }
+
+      ensureSeedData();
+
+      var urlParams = new URLSearchParams(window.location.search);
+      var currentViewMode = urlParams.get('mode') === 'teacher' ? 'teacher' : 'admin';
+      var currentNavSection = 'monitor';
+      var portalEventStreamItems = [];
+
+      var els = {
+        sidebar: document.getElementById('sidebar'),
+        sidebarBackdrop: document.getElementById('sidebarBackdrop'),
+        mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+        sidebarCloseBtn: document.getElementById('sidebarCloseBtn'),
+        switchAdminBtn: document.getElementById('switchAdminBtn'),
+        switchTeacherBtn: document.getElementById('switchTeacherBtn'),
+        headerQuickToggleBtn: document.getElementById('headerQuickToggleBtn'),
+        headerQuickToggleLabel: document.getElementById('headerQuickToggleLabel'),
+        openSeparateTabLink: document.getElementById('openSeparateTabLink'),
+        headerTitleText: document.getElementById('headerTitleText'),
+        headerSubtitleText: document.getElementById('headerSubtitleText'),
+        headerSyncBadge: document.getElementById('headerSyncBadge'),
+        liveClockDisplay: document.getElementById('liveClockDisplay'),
+
+        adminMonitorView: document.getElementById('adminMonitorView'),
+        otherModuleView: document.getElementById('otherModuleView'),
+        otherModuleTitle: document.getElementById('otherModuleTitle'),
+        otherModuleDesc: document.getElementById('otherModuleDesc'),
+        backToMonitorBtn: document.getElementById('backToMonitorBtn'),
+        teacherPortalView: document.getElementById('teacherPortalView'),
+
+        statOnlineCount: document.getElementById('statOnlineCount'),
+        statOfflineCount: document.getElementById('statOfflineCount'),
+        statOfflineSubText: document.getElementById('statOfflineSubText'),
+        statSessionsCount: document.getElementById('statSessionsCount'),
+        statRegisteredCount: document.getElementById('statRegisteredCount'),
+        awayCounterPill: document.getElementById('awayCounterPill'),
+        awayCounterText: document.getElementById('awayCounterText'),
+        liveFacultyGrid: document.getElementById('liveFacultyGrid'),
+
+        filterDateInput: document.getElementById('filterDateInput'),
+        filterTodayBtn: document.getElementById('filterTodayBtn'),
+        filterAllHistoryBtn: document.getElementById('filterAllHistoryBtn'),
+        filterStatusSelect: document.getElementById('filterStatusSelect'),
+        filterSearchInput: document.getElementById('filterSearchInput'),
+        historyTableBody: document.getElementById('historyTableBody'),
+        exportCsvBtn: document.getElementById('exportCsvBtn'),
+        resetDemoBtn: document.getElementById('resetDemoBtn'),
+
+        teacherLoginCard: document.getElementById('teacherLoginCard'),
+        quickTeacherTiles: document.getElementById('quickTeacherTiles'),
+        teacherLoginForm: document.getElementById('teacherLoginForm'),
+        teacherNameInput: document.getElementById('teacherNameInput'),
+        teacherActiveDashboard: document.getElementById('teacherActiveDashboard'),
+        trackerStatusBanner: document.getElementById('trackerStatusBanner'),
+        portalAvatarText: document.getElementById('portalAvatarText'),
+        portalPresenceDot: document.getElementById('portalPresenceDot'),
+        portalTeacherName: document.getElementById('portalTeacherName'),
+        portalStatusPill: document.getElementById('portalStatusPill'),
+        portalBatchSub: document.getElementById('portalBatchSub'),
+        teacherLogoutBtn: document.getElementById('teacherLogoutBtn'),
+        portalLoginTime: document.getElementById('portalLoginTime'),
+        portalLoginDate: document.getElementById('portalLoginDate'),
+        portalElapsedDuration: document.getElementById('portalElapsedDuration'),
+        portalVisibilityState: document.getElementById('portalVisibilityState'),
+        portalHeartbeatSub: document.getElementById('portalHeartbeatSub'),
+        portalTabIdLabel: document.getElementById('portalTabIdLabel'),
+        portalEventStream: document.getElementById('portalEventStream'),
+        toastContainer: document.getElementById('toastContainer')
+      };
+
+      function showToast(message, iconClass) {
+        var toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML =
+          '<i class="' + (iconClass || 'fa-solid fa-circle-check') + '" style="color: var(--accent-green);"></i>' +
+          '<span>' + escapeHtml(message) + '</span>';
+        els.toastContainer.appendChild(toast);
+        setTimeout(function () {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 3200);
+      }
+
+      function appendPortalEvent(label, statusBadgeClass, badgeText) {
+        portalEventStreamItems.unshift({
+          time: formatTime12h(new Date()),
+          label: label,
+          badgeClass: statusBadgeClass,
+          badgeText: badgeText
+        });
+        if (portalEventStreamItems.length > 25) {
+          portalEventStreamItems.length = 25;
+        }
+        renderPortalEventStream();
+      }
+
+      // =========================================================================
+      // DATA ACCESSORS & HYBRID RTDB/LOCALSTORAGE MIRROR
+      // =========================================================================
+      function getRegisteredTeachers() {
+        return safeReadJSON(localStorage, KEYS.TEACHERS, DEFAULT_TEACHERS);
+      }
+
+      function ensureTeacherRegistered(teacherName) {
+        var trimmed = String(teacherName || '').trim();
+        if (!trimmed) return null;
+        var teachers = getRegisteredTeachers();
+        var existing = teachers.find(function (t) {
+          return t.name.toLowerCase() === trimmed.toLowerCase();
+        });
+        if (existing) return existing;
+
+        var newTeacher = {
+          id: 't_' + trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+          name: trimmed,
+          batch: 'Assigned Korean Language Batch',
+          initials: computeInitials(trimmed)
+        };
+        teachers.push(newTeacher);
+        safeWriteJSON(localStorage, KEYS.TEACHERS, teachers);
+        return newTeacher;
+      }
+
+      function getHistoryLogs() {
+        return safeReadJSON(localStorage, KEYS.HISTORY, []);
+      }
+
+      function upsertHistoryRecord(record) {
+        var history = getHistoryLogs();
+        var idx = history.findIndex(function (h) { return h.id === record.id; });
+        if (idx >= 0) {
+          history[idx] = Object.assign({}, history[idx], record);
+        } else {
+          history.unshift(record);
+        }
+        safeWriteJSON(localStorage, KEYS.HISTORY, history);
+      }
+
+      function writeLocalPresenceMirror(teacherId, payload) {
+        var presence = safeReadJSON(localStorage, KEYS.LIVE_STATUS, {});
+        var prev = presence[teacherId] || { teacherId: teacherId };
+        var resolvedLastActive =
+          typeof payload.last_active === 'number'
+            ? payload.last_active
+            : prev.last_active || Date.now();
+        // When ServerValue.TIMESTAMP sentinel is passed, store numeric Date.now() in localStorage mirror
+        if (payload.last_active && typeof payload.last_active === 'object') {
+          resolvedLastActive = Date.now();
+        }
+        presence[teacherId] = Object.assign({}, prev, payload, {
+          last_active: resolvedLastActive,
+          updatedAt: Date.now()
+        });
+        safeWriteJSON(localStorage, KEYS.LIVE_STATUS, presence);
+      }
+
+      // =========================================================================
+      // 1. TEACHER PORTAL LOGIC (FIREBASE RTDB HEARTBEAT + VISIBILITY + CLEANUP)
+      // =========================================================================
+      function getActiveTeacherSession() {
+        return safeReadJSON(sessionStorage, SESSION_KEYS.TEACHER_SESSION, null);
+      }
+
+      function sendFirebaseHeartbeat(teacherId, explicitStatus) {
+        if (!teacherId) return;
+        var nowMs = Date.now();
+        activeTrackerState.lastHeartbeatAtMs = nowMs;
+
+        var updatePayload = {
+          last_active: rtdb ? firebase.database.ServerValue.TIMESTAMP : nowMs
+        };
+        if (explicitStatus) {
+          updatePayload.status = explicitStatus;
+        }
+
+        if (activeTrackerState.statusRef) {
+          activeTrackerState.statusRef.update(updatePayload).catch(function (err) {
+            console.warn('Firebase heartbeat write warning:', err);
+          });
+        }
+
+        writeLocalPresenceMirror(teacherId, {
+          status: explicitStatus || (document.visibilityState === 'hidden' ? 'away' : 'online'),
+          last_active: nowMs
+        });
+
+        var session = getActiveTeacherSession();
+        if (session && session.teacherId === teacherId) {
+          upsertHistoryRecord({
+            id: session.id,
+            teacherId: teacherId,
+            teacher: session.teacher,
+            date: session.date,
+            login: session.login,
+            logout: 'Active Now',
+            duration: formatDurationHuman(nowMs - session.loginTs),
+            last_active: nowMs,
+            status: explicitStatus || (document.visibilityState === 'hidden' ? 'away' : 'online')
+          });
+        }
+      }
+
+      function startTeacherPresenceTracker(session) {
+        // Always clean up any existing interval or visibility listener before starting
+        cleanupTeacherPresenceTracker(false);
+
+        var teacherId = session.teacherId;
+        var initialStatus = document.visibilityState === 'hidden' ? 'away' : 'online';
+        var nowMs = Date.now();
+
+        activeTrackerState.teacherId = teacherId;
+        activeTrackerState.lastHeartbeatAtMs = nowMs;
+
+        if (rtdb) {
+          var statusRef = rtdb.ref('teachers_status/' + teacherId);
+          activeTrackerState.statusRef = statusRef;
+
+          // Initial status on load/login
+          statusRef.set({
+            teacherId: teacherId,
+            teacherName: session.teacher,
+            batch: session.batch || '',
+            status: initialStatus,
+            login: session.login,
+            date: session.date,
+            last_active: firebase.database.ServerValue.TIMESTAMP
+          }).catch(function (err) {
+            console.warn('Firebase initial status warning:', err);
+          });
+
+          // onDisconnect backup (never relied on solely)
+          try {
+            statusRef.onDisconnect().update({
+              status: 'offline',
+              last_active: firebase.database.ServerValue.TIMESTAMP
+            });
+          } catch (discErr) {
+            console.warn('onDisconnect setup warning:', discErr);
+          }
+        }
+
+        writeLocalPresenceMirror(teacherId, {
+          teacherId: teacherId,
+          teacher: session.teacher,
+          batch: session.batch || '',
+          status: initialStatus,
+          login: session.login,
+          date: session.date,
+          last_active: nowMs
+        });
+
+        // Heartbeat: send a pulse every 20 seconds updating last_active
+        activeTrackerState.heartbeatIntervalId = setInterval(function () {
+          sendFirebaseHeartbeat(teacherId);
+          appendPortalEvent('20s Heartbeat pulse sent (last_active updated)', 'pill-online', 'Pulse');
+        }, HEARTBEAT_INTERVAL_MS);
+
+        // Tab Visibility (Away / Online)
+        activeTrackerState.visibilityHandler = function () {
+          var currentSession = getActiveTeacherSession();
+          if (!currentSession) return;
+
+          if (document.visibilityState === 'hidden') {
+            currentSession.status = 'away';
+            sessionStorage.setItem(SESSION_KEYS.TEACHER_SESSION, JSON.stringify(currentSession));
+
+            if (activeTrackerState.statusRef) {
+              activeTrackerState.statusRef.update({ status: 'away' }).catch(function () {});
+            }
+            writeLocalPresenceMirror(teacherId, { status: 'away' });
+            appendPortalEvent('Tab hidden / switched -> status updated to Away', 'pill-away', 'Away');
+          } else {
+            currentSession.status = 'online';
+            sessionStorage.setItem(SESSION_KEYS.TEACHER_SESSION, JSON.stringify(currentSession));
+
+            // Back to visible -> set online AND send immediate heartbeat
+            sendFirebaseHeartbeat(teacherId, 'online');
+            appendPortalEvent('Tab visible -> status Online + immediate heartbeat', 'pill-online', 'Online');
+          }
+          renderAll();
+        };
+
+        document.addEventListener('visibilitychange', activeTrackerState.visibilityHandler);
+
+        // Best-effort offline mark on tab/window unload
+        activeTrackerState.beforeUnloadHandler = function () {
+          var currentSession = getActiveTeacherSession();
+          if (!currentSession) return;
+          var exitMs = Date.now();
+          var logoutStr = formatTime12h(new Date(exitMs));
+          var durationStr = formatDurationHuman(exitMs - currentSession.loginTs);
+
+          if (activeTrackerState.statusRef) {
+            activeTrackerState.statusRef.update({
+              status: 'offline',
+              last_active: firebase.database.ServerValue.TIMESTAMP
+            }).catch(function () {});
+          }
+          writeLocalPresenceMirror(teacherId, {
+            status: 'offline',
+            logout: logoutStr,
+            last_active: exitMs
+          });
+          upsertHistoryRecord({
+            id: currentSession.id,
+            teacherId: teacherId,
+            teacher: currentSession.teacher,
+            date: currentSession.date,
+            login: currentSession.login,
+            logout: logoutStr,
+            duration: durationStr,
+            last_active: exitMs,
+            status: 'offline'
+          });
+        };
+
+        window.addEventListener('beforeunload', activeTrackerState.beforeUnloadHandler);
+      }
+
+      function cleanupTeacherPresenceTracker(markOfflineInFirebase) {
+        if (activeTrackerState.heartbeatIntervalId) {
+          clearInterval(activeTrackerState.heartbeatIntervalId);
+          activeTrackerState.heartbeatIntervalId = null;
+        }
+        if (activeTrackerState.visibilityHandler) {
+          document.removeEventListener('visibilitychange', activeTrackerState.visibilityHandler);
+          activeTrackerState.visibilityHandler = null;
+        }
+        if (activeTrackerState.beforeUnloadHandler) {
+          window.removeEventListener('beforeunload', activeTrackerState.beforeUnloadHandler);
+          activeTrackerState.beforeUnloadHandler = null;
+        }
+
+        if (markOfflineInFirebase && activeTrackerState.teacherId) {
+          var tId = activeTrackerState.teacherId;
+          var offMs = Date.now();
+
+          if (activeTrackerState.statusRef) {
+            try {
+              activeTrackerState.statusRef.onDisconnect().cancel();
+            } catch (e) {}
+            activeTrackerState.statusRef.update({
+              status: 'offline',
+              last_active: firebase.database.ServerValue.TIMESTAMP
+            }).catch(function () {});
+          }
+          writeLocalPresenceMirror(tId, {
+            status: 'offline',
+            last_active: offMs
+          });
+        }
+
+        activeTrackerState.teacherId = null;
+        activeTrackerState.statusRef = null;
+        activeTrackerState.lastHeartbeatAtMs = null;
+      }
+
+      function startTeacherSession(rawName) {
+        var teacherObj = ensureTeacherRegistered(rawName);
+        if (!teacherObj) return;
+
+        if (getActiveTeacherSession()) {
+          endTeacherSession(true);
+        }
+
+        var now = new Date();
+        var nowMs = now.getTime();
+        var dateStr = getTodayDateString();
+        var loginStr = formatTime12h(now);
+        var sessionId = generateId('sess');
+        var initialStatus = document.visibilityState === 'hidden' ? 'away' : 'online';
+
+        var session = {
+          id: sessionId,
+          teacherId: teacherObj.id,
+          teacher: teacherObj.name,
+          batch: teacherObj.batch,
+          initials: teacherObj.initials,
+          date: dateStr,
+          login: loginStr,
+          login_time: now.toISOString(),
+          loginTs: nowMs,
+          status: initialStatus
+        };
+
+        sessionStorage.setItem(SESSION_KEYS.TEACHER_SESSION, JSON.stringify(session));
+        localStorage.setItem('login_time', session.login_time);
+
+        upsertHistoryRecord({
+          id: sessionId,
+          teacherId: teacherObj.id,
+          teacher: teacherObj.name,
+          date: dateStr,
+          login: loginStr,
+          logout: 'Active Now',
+          duration: '0 secs',
+          last_active: nowMs,
+          status: initialStatus
+        });
+
+        startTeacherPresenceTracker(session);
+
+        portalEventStreamItems = [];
+        appendPortalEvent('Session started (' + teacherObj.name + ' · initial status ' + initialStatus + ')', 'pill-online', 'Online');
+        showToast(teacherObj.name + ' is Online (20s Firebase heartbeat started).');
+        renderAll();
+      }
+
+      function endTeacherSession(silent) {
+        var session = getActiveTeacherSession();
+        if (!session) {
+          cleanupTeacherPresenceTracker(true);
+          return;
+        }
+
+        var now = new Date();
+        var nowMs = now.getTime();
+        var logoutStr = formatTime12h(now);
+        var durationStr = formatDurationHuman(nowMs - session.loginTs);
+
+        upsertHistoryRecord({
+          id: session.id,
+          teacherId: session.teacherId,
+          teacher: session.teacher,
+          date: session.date,
+          login: session.login,
+          logout: logoutStr,
+          duration: durationStr,
+          last_active: nowMs,
+          status: 'offline'
+        });
+
+        writeLocalPresenceMirror(session.teacherId, {
+          logout: logoutStr,
+          last_active: nowMs,
+          status: 'offline'
+        });
+
+        // Properly clean up setInterval, visibilitychange, and mark offline in Firebase
+        cleanupTeacherPresenceTracker(true);
+        sessionStorage.removeItem(SESSION_KEYS.TEACHER_SESSION);
+
+        if (!silent) {
+          showToast(session.teacher + ' logged out cleanly (intervals & listeners removed).');
+          renderAll();
+        }
+      }
+
+      // =========================================================================
+      // 2. ADMIN DASHBOARD LOGIC (FIREBASE ON('VALUE') + >60s TIMEOUT ENGINE)
+      // =========================================================================
+      function startAdminMonitorListener() {
+        if (!rtdb || adminStatusRef) return;
+        try {
+          adminStatusRef = rtdb.ref('teachers_status');
+          adminValueCallback = function (snapshot) {
+            var data = snapshot.val() || {};
+            firebaseTeachersStatusMap = data;
+            if (currentViewMode === 'admin' && currentNavSection === 'monitor') {
+              renderAdminDashboard();
+            }
+          };
+          adminStatusRef.on('value', adminValueCallback, function (err) {
+            console.warn('Firebase teachers_status listener fallback:', err && err.message);
+          });
+        } catch (err) {
+          console.warn('Unable to attach RTDB teachers_status listener:', err);
+        }
+      }
+
+      /**
+       * Evaluates real teacher status from `status` + `last_active` timestamp:
+       * - diff > 60s  -> "Offline (Timeout)" (Red dot)
+       * - status === 'offline' -> "Offline" (Red dot)
+       * - status === 'away' && diff <= 60s -> "Away" (Yellow dot)
+       * - status === 'online' && diff <= 60s -> "Online" (Green dot, active heartbeat < 30s)
+       */
+      function resolvePresenceState(entry, nowMs) {
+        var now = nowMs || Date.now();
+        var rawStatus = String((entry && entry.status) || 'offline').toLowerCase();
+        var lastActiveMs = entry && typeof entry.last_active === 'number' ? entry.last_active : 0;
+        var diffMs = lastActiveMs ? Math.max(0, now - lastActiveMs) : Infinity;
+
+        if (rawStatus === 'offline') {
+          return {
+            key: 'Offline',
+            label: 'Offline',
+            dotClass: 'dot-red',
+            pillClass: 'pill-offline',
+            cardClass: 'status-offline',
+            lastActiveMs: lastActiveMs,
+            diffMs: diffMs
+          };
+        }
+
+        // CRITICAL TIMEOUT RULE: > 60 seconds without a heartbeat -> Offline (Timeout)
+        if (diffMs > TIMEOUT_THRESHOLD_MS) {
+          return {
+            key: 'Offline',
+            label: 'Offline (Timeout)',
+            dotClass: 'dot-red',
+            pillClass: 'pill-offline',
+            cardClass: 'status-offline',
+            lastActiveMs: lastActiveMs,
+            diffMs: diffMs
+          };
+        }
+
+        if (rawStatus === 'away') {
+          return {
+            key: 'Away',
+            label: 'Away',
+            dotClass: 'dot-yellow',
+            pillClass: 'pill-away',
+            cardClass: 'status-away',
+            lastActiveMs: lastActiveMs,
+            diffMs: diffMs
+          };
+        }
+
+        return {
+          key: 'Online',
+          label: 'Online',
+          dotClass: 'dot-green',
+          pillClass: 'pill-online',
+          cardClass: 'status-online',
+          lastActiveMs: lastActiveMs,
+          diffMs: diffMs
+        };
+      }
+
+      function getCombinedTeachersPresence() {
+        var teachers = getRegisteredTeachers();
+        var localMirror = safeReadJSON(localStorage, KEYS.LIVE_STATUS, {});
+        var map = {};
+
+        teachers.forEach(function (t) {
+          var fbEntry = firebaseTeachersStatusMap[t.id] || null;
+          var localEntry = localMirror[t.id] || localMirror[t.name] || null;
+
+          // Prefer whichever record has the newer `last_active` timestamp
+          var chosen = fbEntry;
+          if (!chosen && localEntry) {
+            chosen = localEntry;
+          } else if (fbEntry && localEntry) {
+            var fbTs = typeof fbEntry.last_active === 'number' ? fbEntry.last_active : 0;
+            var locTs = typeof localEntry.last_active === 'number' ? localEntry.last_active : 0;
+            chosen = locTs > fbTs ? localEntry : fbEntry;
+          }
+
+          map[t.id] = chosen || {
+            teacherId: t.id,
+            teacherName: t.name,
+            batch: t.batch,
+            status: 'offline',
+            last_active: 0
+          };
+        });
+
+        return map;
+      }
+
+      // Cross-tab instant mirror sync for local testing without RTDB latency
+      window.addEventListener('storage', function (e) {
+        if (
+          e.key === KEYS.LIVE_STATUS ||
+          e.key === KEYS.HISTORY ||
+          e.key === KEYS.TEACHERS
+        ) {
+          renderAdminDashboard();
+          renderTeacherPortal();
+        }
+      });
+
+      // =========================================================================
+      // 3. RENDERING LOGIC (STATUS DOTS + LAST ACTIVE COLUMN)
+      // =========================================================================
+      function renderStatusBadge(resolved) {
+        return (
+          '<span class="status-pill ' + resolved.pillClass + '">' +
+            '<span class="inline-dot ' + resolved.dotClass + '"></span>' +
+            '<span>' + escapeHtml(resolved.label) + '</span>' +
+          '</span>'
+        );
+      }
+
+      function renderLastActiveCell(lastActiveMs, nowMs) {
+        if (!lastActiveMs) {
+          return '<span class="font-mono" style="color:var(--text-muted);">—</span>';
+        }
+        var rel = formatRelativeLastActive(lastActiveMs, nowMs);
+        var exact = formatTime12h(new Date(lastActiveMs));
+        return (
+          '<div class="last-active-cell">' +
+            '<span class="last-active-rel">' + escapeHtml(rel) + '</span>' +
+            '<span class="last-active-exact font-mono">' + escapeHtml(exact) + '</span>' +
+          '</div>'
+        );
+      }
+
+      function renderAdminDashboard() {
+        var nowMs = Date.now();
+        var teachers = getRegisteredTeachers();
+        var presenceMap = getCombinedTeachersPresence();
+        var history = getHistoryLogs();
+
+        var onlineCount = 0;
+        var awayCount = 0;
+        var offlineCount = 0;
+
+        var teacherStates = teachers.map(function (t) {
+          var entry = presenceMap[t.id];
+          var resolved = resolvePresenceState(entry, nowMs);
+          if (resolved.key === 'Online') onlineCount++;
+          else if (resolved.key === 'Away') awayCount++;
+          else offlineCount++;
+          return { teacher: t, entry: entry, resolved: resolved };
+        });
+
+        els.statOnlineCount.textContent = String(onlineCount);
+        els.statOfflineCount.textContent = String(offlineCount);
+        els.statOfflineSubText.textContent =
+          awayCount > 0 ? awayCount + ' Away · No heartbeat >60s' : 'Signed out or >60s timeout';
+        els.statSessionsCount.textContent = String(history.length);
+        els.statRegisteredCount.textContent = String(teachers.length);
+
+        if (awayCount > 0) {
+          els.awayCounterPill.classList.remove('hidden');
+          els.awayCounterText.textContent = awayCount + ' Away';
+        } else {
+          els.awayCounterPill.classList.add('hidden');
+        }
+
+        // Render Live Faculty Presence Cards
+        els.liveFacultyGrid.innerHTML = teacherStates
+          .map(function (item) {
+            var t = item.teacher;
+            var entry = item.entry || {};
+            var resolved = item.resolved;
+            var lastActiveText = resolved.lastActiveMs
+              ? formatRelativeLastActive(resolved.lastActiveMs, nowMs)
+              : 'Never';
+
+            return (
+              '<div class="faculty-card ' + resolved.cardClass + '">' +
+                '<div class="faculty-top">' +
+                  '<div class="faculty-identity">' +
+                    '<div class="faculty-avatar">' +
+                      escapeHtml(t.initials || computeInitials(t.name)) +
+                      '<span class="presence-dot ' + resolved.dotClass + '" title="' + escapeHtml(resolved.label) + '"></span>' +
+                    '</div>' +
+                    '<div style="min-width:0;">' +
+                      '<div class="faculty-name">' + escapeHtml(t.name) + '</div>' +
+                      '<div class="faculty-batch">' + escapeHtml(t.batch || 'Faculty Instructor') + '</div>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="faculty-meta">' +
+                  renderStatusBadge(resolved) +
+                  '<span class="font-mono" title="' + escapeHtml(entry.last_active ? formatTime12h(new Date(entry.last_active)) : 'No pulse') + '">' +
+                    escapeHtml(lastActiveText) +
+                  '</span>' +
+                '</div>' +
+              '</div>'
+            );
+          })
+          .join('');
+
+        // Filter Activity Table
+        var selectedDate = els.filterDateInput.value.trim();
+        var selectedStatus = els.filterStatusSelect.value;
+        var searchQuery = els.filterSearchInput.value.trim().toLowerCase();
+
+        // Map latest resolved status per teacherId so active rows reflect real-time 60s timeout
+        var latestResolvedByTeacherId = {};
+        teacherStates.forEach(function (item) {
+          latestResolvedByTeacherId[item.teacher.id] = item.resolved;
+        });
+
+        var enrichedRows = history.map(function (row) {
+          var liveResolved = row.teacherId ? latestResolvedByTeacherId[row.teacherId] : null;
+          var isLiveSessionRow = row.logout === 'Active Now' && liveResolved;
+          var rowResolved = isLiveSessionRow
+            ? liveResolved
+            : resolvePresenceState({ status: row.status, last_active: row.last_active }, nowMs);
+          var effectiveLastActive = isLiveSessionRow && liveResolved.lastActiveMs
+            ? liveResolved.lastActiveMs
+            : row.last_active;
+
+          return Object.assign({}, row, {
+            _resolved: rowResolved,
+            _lastActiveMs: effectiveLastActive
+          });
+        });
+
+        var filtered = enrichedRows.filter(function (row) {
+          if (selectedDate && row.date !== selectedDate) return false;
+          if (selectedStatus !== 'All') {
+            if (selectedStatus === 'Tab Closed') {
+              if (row.status !== 'Tab Closed') return false;
+            } else if (row._resolved.key !== selectedStatus) {
+              return false;
+            }
+          }
+          if (searchQuery && String(row.teacher || '').toLowerCase().indexOf(searchQuery) === -1) return false;
+          return true;
+        });
+
+        if (filtered.length === 0) {
+          els.historyTableBody.innerHTML =
+            '<tr><td colspan="7" class="empty-state">' +
+              '<i class="fa-regular fa-folder-open" style="font-size:22px; display:block; margin-bottom:8px; color:var(--text-muted);"></i>' +
+              'No teacher activity sessions match your current filters.' +
+            '</td></tr>';
+          return;
+        }
+
+        els.historyTableBody.innerHTML = filtered
+          .map(function (row) {
+            var initials = computeInitials(row.teacher);
+            var durationText = row.duration || '—';
+            var isTimedOut = row._resolved.label === 'Offline (Timeout)';
+            var logoutDisplay =
+              row.logout === 'Active Now' && isTimedOut ? 'Timed Out (>60s)' : row.logout;
+            var logoutColor =
+              row.logout === 'Active Now' && !isTimedOut
+                ? 'var(--accent-green)'
+                : isTimedOut
+                ? 'var(--accent-red)'
+                : 'var(--text-secondary)';
+
+            return (
+              '<tr>' +
+                '<td>' +
+                  '<div class="teacher-cell">' +
+                    '<div class="mini-avatar">' + escapeHtml(initials) + '</div>' +
+                    '<span>' + escapeHtml(row.teacher) + '</span>' +
+                  '</div>' +
+                '</td>' +
+                '<td class="font-mono" style="color: var(--text-secondary);">' + escapeHtml(row.date) + '</td>' +
+                '<td class="font-mono">' + escapeHtml(row.login) + '</td>' +
+                '<td class="font-mono" style="color:' + logoutColor + ';">' + escapeHtml(logoutDisplay) + '</td>' +
+                '<td class="font-mono" style="font-weight:600;">' + escapeHtml(durationText) + '</td>' +
+                '<td>' + renderLastActiveCell(row._lastActiveMs, nowMs) + '</td>' +
+                '<td>' + renderStatusBadge(row._resolved) + '</td>' +
+              '</tr>'
+            );
+          })
+          .join('');
+      }
+
+      function renderQuickTeacherTiles() {
+        var teachers = getRegisteredTeachers();
+        var selectedVal = els.teacherNameInput.value.trim().toLowerCase();
+        els.quickTeacherTiles.innerHTML = teachers
+          .map(function (t) {
+            var isSelected = selectedVal === t.name.toLowerCase();
+            return (
+              '<button type="button" class="teacher-select-tile ' + (isSelected ? 'selected' : '') + '" data-teacher-name="' + escapeHtml(t.name) + '">' +
+                '<div style="font-weight:700; font-size:13px;">' + escapeHtml(t.name) + '</div>' +
+                '<div style="font-size:11px; color:var(--text-muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(t.batch) + '</div>' +
+              '</button>'
+            );
+          })
+          .join('');
+
+        Array.prototype.forEach.call(els.quickTeacherTiles.querySelectorAll('.teacher-select-tile'), function (btn) {
+          btn.addEventListener('click', function () {
+            els.teacherNameInput.value = btn.getAttribute('data-teacher-name') || '';
+            renderQuickTeacherTiles();
+          });
+        });
+      }
+
+      function renderPortalEventStream() {
+        if (portalEventStreamItems.length === 0) {
+          els.portalEventStream.innerHTML =
+            '<div style="color:var(--text-muted); text-align:center; padding:16px;">Waiting for heartbeat pulses or visibility events...</div>';
+          return;
+        }
+        els.portalEventStream.innerHTML = portalEventStreamItems
+          .map(function (ev) {
+            return (
+              '<div class="event-row">' +
+                '<div style="display:flex; align-items:center; gap:10px; min-width:0;">' +
+                  '<span class="font-mono" style="color:var(--text-muted); font-size:11px; flex-shrink:0;">' + escapeHtml(ev.time) + '</span>' +
+                  '<span style="color:#ffffff; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(ev.label) + '</span>' +
+                '</div>' +
+                '<span class="status-pill ' + ev.badgeClass + '">' + escapeHtml(ev.badgeText) + '</span>' +
+              '</div>'
+            );
+          })
+          .join('');
+      }
+
+      function renderTeacherPortal() {
+        var session = getActiveTeacherSession();
+        if (!session) {
+          els.teacherLoginCard.classList.remove('hidden');
+          els.teacherActiveDashboard.classList.add('hidden');
+          renderQuickTeacherTiles();
+          return;
+        }
+
+        els.teacherLoginCard.classList.add('hidden');
+        els.teacherActiveDashboard.classList.remove('hidden');
+
+        var isAway = document.visibilityState === 'hidden' || session.status === 'away';
+        els.portalTeacherName.textContent = session.teacher;
+        els.portalAvatarText.textContent = session.initials || computeInitials(session.teacher);
+        els.portalBatchSub.textContent = session.batch || 'Faculty Instructor';
+        els.portalLoginTime.textContent = session.login;
+        els.portalLoginDate.textContent = session.date;
+        els.portalElapsedDuration.textContent = formatDurationHuman(Date.now() - session.loginTs);
+        els.portalVisibilityState.textContent = document.visibilityState;
+        els.portalVisibilityState.style.color = isAway ? 'var(--accent-yellow)' : 'var(--accent-green)';
+        els.portalTabIdLabel.textContent = 'Tab ID: ' + TAB_ID;
+
+        if (activeTrackerState.lastHeartbeatAtMs) {
+          var pulseAge = Math.max(0, Math.floor((Date.now() - activeTrackerState.lastHeartbeatAtMs) / 1000));
+          els.portalHeartbeatSub.textContent = 'Last 20s pulse: ' + pulseAge + 's ago · Ref: teachers_status/' + session.teacherId;
+        }
+
+        if (isAway) {
+          els.trackerStatusBanner.classList.add('state-away');
+          els.portalPresenceDot.className = 'presence-dot dot-yellow';
+          els.portalStatusPill.className = 'status-pill pill-away';
+          els.portalStatusPill.innerHTML = '<span class="inline-dot dot-yellow"></span><span>Away</span>';
+        } else {
+          els.trackerStatusBanner.classList.remove('state-away');
+          els.portalPresenceDot.className = 'presence-dot dot-green';
+          els.portalStatusPill.className = 'status-pill pill-online';
+          els.portalStatusPill.innerHTML = '<span class="inline-dot dot-green"></span><span>Online</span>';
+        }
+
+        renderPortalEventStream();
+      }
+
+      function renderAll() {
+        if (currentViewMode === 'teacher') {
+          els.adminMonitorView.classList.add('hidden');
+          els.otherModuleView.classList.add('hidden');
+          els.teacherPortalView.classList.remove('hidden');
+
+          els.headerTitleText.textContent = 'Teacher Portal';
+          els.headerSubtitleText.textContent = '20s Firebase Heartbeat tracker, tab visibility detection, and clean logout cleanup';
+          els.headerSyncBadge.classList.remove('hidden');
+          els.headerQuickToggleLabel.textContent = 'Switch to Admin Monitor';
+          els.openSeparateTabLink.href = '?mode=admin';
+          els.openSeparateTabLink.querySelector('span').textContent = 'Open Admin Monitor Tab';
+
+          els.switchTeacherBtn.classList.add('active-teacher');
+          els.switchAdminBtn.classList.remove('active-admin');
+        } else {
+          els.teacherPortalView.classList.add('hidden');
+
+          if (currentNavSection === 'monitor') {
+            els.adminMonitorView.classList.remove('hidden');
+            els.otherModuleView.classList.add('hidden');
+            els.headerTitleText.textContent = 'Teacher Activity Monitor';
+            els.headerSubtitleText.textContent = 'Firebase Realtime Database Heartbeat (20s) + Timeout (>60s) faculty presence & session monitor';
+            els.headerSyncBadge.classList.remove('hidden');
+          } else {
+            els.adminMonitorView.classList.add('hidden');
+            els.otherModuleView.classList.remove('hidden');
+            els.headerSyncBadge.classList.add('hidden');
+          }
+
+          els.headerQuickToggleLabel.textContent = 'Switch to Teacher Portal';
+          els.openSeparateTabLink.href = '?mode=teacher';
+          els.openSeparateTabLink.querySelector('span').textContent = 'Open Teacher Tab for Live Sync';
+
+          els.switchAdminBtn.classList.add('active-admin');
+          els.switchTeacherBtn.classList.remove('active-teacher');
+        }
+
+        renderAdminDashboard();
+        renderTeacherPortal();
+      }
+
+      // =========================================================================
+      // SIDEBAR & FILTER EVENT LISTENERS
+      // =========================================================================
+      var MODULE_INFO = {
+        students: {
+          title: 'Student Directory',
+          desc: 'Browse enrolled Korean language students, roll numbers, serial IDs, and guardian WhatsApp contacts.'
+        },
+        admissions: {
+          title: 'Admission Requests',
+          desc: 'Review incoming prospective student enrollments and approve batch allocations.'
+        },
+        batches: {
+          title: 'Batch & Classes',
+          desc: 'Manage Morning & Evening cohorts, capacity, schedules, and assigned instructors.'
+        },
+        teachers: {
+          title: 'Teacher Management',
+          desc: 'Manage registered faculty accounts, assigned batches, and LMS monitor permissions.'
+        },
+        attendance: {
+          title: 'Daily Attendance',
+          desc: 'Track daily student attendance alongside ZKTeco biometric check-in logs.'
+        },
+        tests: {
+          title: 'Weekly Tests',
+          desc: 'Record modular Korean vocabulary, grammar, reading, and TOPIK assessment marks.'
+        },
+        materials: {
+          title: 'Study Materials',
+          desc: 'Organize curriculum worksheets, Hangul audio drills, and TOPIK prep handouts.'
+        }
+      };
+
+      function closeMobileSidebar() {
+        els.sidebar.classList.remove('open');
+        els.sidebarBackdrop.classList.remove('open');
+      }
+
+      els.mobileMenuBtn.addEventListener('click', function () {
+        els.sidebar.classList.add('open');
+        els.sidebarBackdrop.classList.add('open');
+      });
+
+      els.sidebarCloseBtn.addEventListener('click', closeMobileSidebar);
+      els.sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+      Array.prototype.forEach.call(document.querySelectorAll('.nav-item-btn'), function (btn) {
+        btn.addEventListener('click', function () {
+          var section = btn.getAttribute('data-section') || 'monitor';
+          currentNavSection = section;
+          currentViewMode = 'admin';
+
+          Array.prototype.forEach.call(document.querySelectorAll('.nav-item-btn'), function (b) {
+            b.classList.remove('active');
+          });
+          btn.classList.add('active');
+
+          if (section !== 'monitor' && MODULE_INFO[section]) {
+            els.headerTitleText.textContent = MODULE_INFO[section].title;
+            els.headerSubtitleText.textContent = MODULE_INFO[section].desc;
+            els.otherModuleTitle.textContent = MODULE_INFO[section].title;
+            els.otherModuleDesc.textContent = MODULE_INFO[section].desc;
+          }
+
+          closeMobileSidebar();
+          renderAll();
+        });
+      });
+
+      els.backToMonitorBtn.addEventListener('click', function () {
+        currentNavSection = 'monitor';
+        currentViewMode = 'admin';
+        Array.prototype.forEach.call(document.querySelectorAll('.nav-item-btn'), function (b) {
+          b.classList.toggle('active', b.getAttribute('data-section') === 'monitor');
+        });
+        renderAll();
+      });
+
+      els.switchAdminBtn.addEventListener('click', function () {
+        currentViewMode = 'admin';
+        currentNavSection = 'monitor';
+        Array.prototype.forEach.call(document.querySelectorAll('.nav-item-btn'), function (b) {
+          b.classList.toggle('active', b.getAttribute('data-section') === 'monitor');
+        });
+        closeMobileSidebar();
+        renderAll();
+      });
+
+      els.switchTeacherBtn.addEventListener('click', function () {
+        currentViewMode = 'teacher';
+        closeMobileSidebar();
+        renderAll();
+      });
+
+      els.headerQuickToggleBtn.addEventListener('click', function () {
+        currentViewMode = currentViewMode === 'admin' ? 'teacher' : 'admin';
+        if (currentViewMode === 'admin') {
+          currentNavSection = 'monitor';
+          Array.prototype.forEach.call(document.querySelectorAll('.nav-item-btn'), function (b) {
+            b.classList.toggle('active', b.getAttribute('data-section') === 'monitor');
+          });
+        }
+        renderAll();
+      });
+
+      // Filters
+      els.filterDateInput.addEventListener('change', function () {
+        els.filterTodayBtn.classList.remove('active-filter');
+        els.filterAllHistoryBtn.classList.toggle('active-filter', !els.filterDateInput.value);
+        renderAdminDashboard();
+      });
+
+      els.filterTodayBtn.addEventListener('click', function () {
+        els.filterDateInput.value = getTodayDateString();
+        els.filterTodayBtn.classList.add('active-filter');
+        els.filterAllHistoryBtn.classList.remove('active-filter');
+        renderAdminDashboard();
+      });
+
+      els.filterAllHistoryBtn.addEventListener('click', function () {
+        els.filterDateInput.value = '';
+        els.filterAllHistoryBtn.classList.add('active-filter');
+        els.filterTodayBtn.classList.remove('active-filter');
+        renderAdminDashboard();
+      });
+
+      els.filterStatusSelect.addEventListener('change', renderAdminDashboard);
+      els.filterSearchInput.addEventListener('input', renderAdminDashboard);
+
+      // Export CSV
+      els.exportCsvBtn.addEventListener('click', function () {
+        var nowMs = Date.now();
+        var history = getHistoryLogs();
+        var headers = ['Teacher Name', 'Date', 'Login Time', 'Logout Time', 'Active Duration', 'Last Active', 'Current Status'];
+        var rows = history.map(function (r) {
+          var res = resolvePresenceState({ status: r.status, last_active: r.last_active }, nowMs);
+          var lastAct = r.last_active ? formatTime12h(new Date(r.last_active)) : '—';
+          return [r.teacher, r.date, r.login, r.logout, r.duration, lastAct, res.label]
+            .map(function (v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; })
+            .join(',');
+        });
+        var csvContent = headers.join(',') + '\n' + rows.join('\n');
+        var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = 'teacher-activity-log-' + getTodayDateString() + '.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast('Exported ' + history.length + ' session records to CSV.');
+      });
+
+      // Inline two-click Reset Demo Data
+      var resetArmed = false;
+      var resetArmTimer = null;
+      els.resetDemoBtn.addEventListener('click', function () {
+        if (!resetArmed) {
+          resetArmed = true;
+          els.resetDemoBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Click Again to Confirm</span>';
+          clearTimeout(resetArmTimer);
+          resetArmTimer = setTimeout(function () {
+            resetArmed = false;
+            els.resetDemoBtn.innerHTML = '<i class="fa-solid fa-rotate"></i><span>Reset Demo Data</span>';
+          }, 3500);
+          return;
+        }
+        resetArmed = false;
+        clearTimeout(resetArmTimer);
+        els.resetDemoBtn.innerHTML = '<i class="fa-solid fa-rotate"></i><span>Reset Demo Data</span>';
+        cleanupTeacherPresenceTracker(true);
+        localStorage.removeItem(KEYS.TEACHERS);
+        localStorage.removeItem(KEYS.LIVE_STATUS);
+        localStorage.removeItem(KEYS.HISTORY);
+        sessionStorage.removeItem(SESSION_KEYS.TEACHER_SESSION);
+        ensureSeedData();
+        renderAll();
+        showToast('Presence and session demo data reset.');
+      });
+
+      // Teacher Portal Login & Logout
+      els.teacherLoginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var name = els.teacherNameInput.value.trim();
+        if (!name) return;
+        startTeacherSession(name);
+      });
+
+      els.teacherLogoutBtn.addEventListener('click', function () {
+        endTeacherSession(false);
+      });
+
+      // =========================================================================
+      // LIVE 1-SECOND CLOCK & TIMEOUT RE-EVALUATION TICKER
+      // =========================================================================
+      function updateTick() {
+        var now = new Date();
+        els.liveClockDisplay.textContent = now.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+
+        var session = getActiveTeacherSession();
+        if (session) {
+          var elapsed = formatDurationHuman(Date.now() - session.loginTs);
+          upsertHistoryRecord({
+            id: session.id,
+            teacherId: session.teacherId,
+            teacher: session.teacher,
+            date: session.date,
+            login: session.login,
+            logout: 'Active Now',
+            duration: elapsed,
+            last_active: activeTrackerState.lastHeartbeatAtMs || Date.now(),
+            status: document.visibilityState === 'hidden' ? 'away' : 'online'
+          });
+        }
+
+        if (currentViewMode === 'admin' && currentNavSection === 'monitor') {
+          renderAdminDashboard();
+        } else if (currentViewMode === 'teacher') {
+          renderTeacherPortal();
+        }
+      }
+
+      // Restore active teacher session tracker on page reload if signed in
+      var restoredSession = getActiveTeacherSession();
+      if (restoredSession) {
+        startTeacherPresenceTracker(restoredSession);
+      }
+
+      // Start Firebase RTDB Admin `teachers_status` real-time listener
+      startAdminMonitorListener();
+
+      // Default select first teacher tile for fast 1-click sign-in
+      els.teacherNameInput.value = 'Sir Faheem';
+      renderAll();
+      updateTick();
+      setInterval(updateTick, 1000);
+    })();
+  </script>
+</body>
+</html>

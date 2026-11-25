@@ -1,0 +1,2527 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OK Korean LMS — Student Directory &amp; Automated Fee Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      --bg-root: #09090b;
+      --bg-sidebar: #0d0d11;
+      --bg-card: #18181b;
+      --bg-elevated: #121216;
+      --bg-hover: #202026;
+      --border-subtle: #27272a;
+      --border-strong: #3f3f46;
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-green: #10b981;
+      --accent-green-soft: rgba(16, 185, 129, 0.14);
+      --accent-red: #ef4444;
+      --accent-red-soft: rgba(239, 68, 68, 0.14);
+      --accent-indigo: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--bg-root);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+    /* App Layout */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      background:
+        radial-gradient(circle at 16% 0%, rgba(16, 185, 129, 0.06), transparent 34%),
+        radial-gradient(circle at 86% 6%, rgba(239, 68, 68, 0.04), transparent 30%),
+        var(--bg-root);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 40;
+      transition: transform 0.24s ease;
+    }
+
+    .sidebar-brand {
+      padding: 20px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: var(--accent-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.18);
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--accent-green);
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 10px 6px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 13px;
+      border-radius: 11px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-card);
+      border-color: var(--border-subtle);
+      color: #ffffff;
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.16), rgba(16, 185, 129, 0.04));
+      border-color: rgba(16, 185, 129, 0.45);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.12);
+    }
+
+    .nav-btn.active i {
+      color: var(--accent-green);
+    }
+
+    .nav-btn-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-count {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: #27272a;
+      color: var(--text-secondary);
+      font-weight: 700;
+    }
+
+    .nav-btn.active .nav-count {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
+    }
+
+    .sidebar-footer {
+      padding: 14px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Main Workspace */
+    .main-area {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(9, 9, 11, 0.86);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mobile-menu-btn, .sidebar-close-btn {
+      display: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .topbar h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .topbar p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .content-container {
+      padding: 24px;
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: #27272a;
+      border-color: var(--border-strong);
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 11.5px;
+      border-radius: 8px;
+    }
+
+    .btn-green {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+      color: #052e16;
+      font-weight: 700;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-green:hover {
+      background: #059669;
+      border-color: #059669;
+      color: #ffffff;
+    }
+
+    .btn-red {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+    }
+
+    .btn-red:hover {
+      background: var(--accent-red);
+      border-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .control-input, .control-select {
+      background: #111115;
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.15s ease;
+    }
+
+    .control-input:focus, .control-select:focus {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.16);
+    }
+
+    /* Stats Cards */
+    .stats-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .stats-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 18px 20px;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+    }
+
+    .stat-card.accent-green {
+      border-color: rgba(16, 185, 129, 0.38);
+      box-shadow: 0 8px 26px rgba(16, 185, 129, 0.06);
+    }
+
+    .stat-card.accent-red {
+      border-color: rgba(239, 68, 68, 0.38);
+      box-shadow: 0 8px 26px rgba(239, 68, 68, 0.06);
+    }
+
+    .stat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .stat-title {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .icon-green { background: rgba(16, 185, 129, 0.14); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.35); }
+    .icon-red { background: rgba(239, 68, 68, 0.14); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.35); }
+    .icon-indigo { background: rgba(99, 102, 241, 0.14); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.35); }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* Panel Card */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 15.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .panel-title i {
+      color: var(--accent-green);
+    }
+
+    .panel-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Filter Bar */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab-pills {
+      display: inline-flex;
+      background: #09090b;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .tab-pill-btn {
+      padding: 6px 12px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.14s ease;
+    }
+
+    .tab-pill-btn:hover {
+      color: #ffffff;
+    }
+
+    .tab-pill-btn.active {
+      background: var(--accent-green);
+      color: #052e16;
+      font-weight: 700;
+    }
+
+    .tab-pill-btn.active-due {
+      background: var(--accent-red);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* Responsive Tables */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 740px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    table.data-table thead {
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    table.data-table th {
+      padding: 13px 15px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    table.data-table td {
+      padding: 13px 15px;
+      border-bottom: 1px solid #222229;
+      vertical-align: middle;
+    }
+
+    table.data-table tbody tr {
+      transition: background-color 0.14s ease;
+    }
+
+    table.data-table tbody tr:hover {
+      background: var(--bg-hover);
+    }
+
+    table.data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Highlight Struck Off (Inactive) Student Rows */
+    tr.row-struck-off {
+      background: rgba(239, 68, 68, 0.075);
+    }
+
+    tr.row-struck-off td:first-child {
+      box-shadow: inset 3px 0 0 var(--accent-red);
+    }
+
+    tr.row-struck-off:hover {
+      background: rgba(239, 68, 68, 0.13) !important;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-active {
+      background: var(--accent-green-soft);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.38);
+    }
+
+    .badge-inactive {
+      background: var(--accent-red-soft);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.42);
+    }
+
+    .roll-chip {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 7px;
+      background: #101014;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .empty-box {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 620px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      animation: fadeScale 0.18s ease;
+    }
+
+    @keyframes fadeScale {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-head {
+      padding: 18px 22px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-head h3 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .modal-body {
+      padding: 20px 22px;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .modal-foot {
+      padding: 15px 22px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Printable Fee Slip */
+    .slip-paper {
+      background: #ffffff;
+      color: #09090b;
+      border-radius: 12px;
+      padding: 28px;
+      border: 1px solid #d4d4d8;
+      position: relative;
+    }
+
+    .slip-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 2px solid #09090b;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
+    .slip-logo {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #09090b;
+    }
+
+    .slip-sub {
+      font-size: 11px;
+      color: #52525b;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .slip-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+      font-size: 12.5px;
+    }
+
+    .slip-cell {
+      padding: 10px 12px;
+      border: 1px solid #e4e4e7;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .slip-cell span {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #71717a;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .slip-cell strong {
+      font-size: 13.5px;
+      color: #09090b;
+    }
+
+    .slip-amount-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border: 2px solid #09090b;
+      border-radius: 10px;
+      background: #f4f4f5;
+      margin-bottom: 18px;
+    }
+
+    .slip-stamp {
+      display: inline-block;
+      padding: 6px 16px;
+      border: 3px solid currentColor;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transform: rotate(-6deg);
+    }
+
+    .slip-stamp.stamp-paid {
+      color: #059669;
+    }
+
+    .slip-stamp.stamp-unpaid {
+      color: #dc2626;
+    }
+
+    .slip-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 14px;
+      border-top: 1px dashed #a1a1aa;
+      font-size: 11px;
+      color: #52525b;
+    }
+
+    /* Toast */
+    .toast-stack {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: #18181b;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #ffffff;
+      padding: 11px 16px;
+      border-radius: 11px;
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 35;
+    }
+
+    .sidebar-backdrop.open {
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive Rules */
+    @media (max-width: 1040px) {
+      .stats-grid-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 860px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .mobile-menu-btn, .sidebar-close-btn {
+        display: inline-flex;
+      }
+      .stats-grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .content-container {
+        padding: 16px;
+      }
+      .topbar {
+        padding: 14px 16px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid-4, .form-grid, .slip-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Clean Black-and-White Print Stylesheet */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 14mm;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .app-shell,
+      .toast-stack,
+      .sidebar-backdrop,
+      .no-print {
+        display: none !important;
+      }
+      #printSlipModal {
+        position: static !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      #printSlipModal .modal-box {
+        border: none !important;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        background: #ffffff !important;
+      }
+      #printSlipModal .modal-head,
+      #printSlipModal .modal-foot {
+        display: none !important;
+      }
+      #printSlipModal .modal-body {
+        padding: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      .slip-paper {
+        border: 2px solid #000000 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+      }
+      .slip-cell,
+      .slip-amount-box {
+        background: #ffffff !important;
+        border-color: #000000 !important;
+        color: #000000 !important;
+      }
+      .slip-cell span,
+      .slip-sub,
+      .slip-footer {
+        color: #27272a !important;
+      }
+      .slip-stamp {
+        color: #000000 !important;
+        border-color: #000000 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+  <div class="app-shell">
+    <!-- Left Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-left">
+          <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div>
+            <div class="brand-name">OK Korean LMS</div>
+            <div class="brand-sub">Students &amp; Fee Suite</div>
+          </div>
+        </div>
+        <button id="sidebarCloseBtn" class="sidebar-close-btn" type="button" aria-label="Close sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Primary Navigation">
+        <div class="nav-label">Management Portal</div>
+        <button class="nav-btn active" data-tab="students" type="button">
+          <span class="nav-btn-left">
+            <i class="fa-solid fa-users"></i>
+            <span>Students</span>
+          </span>
+          <span id="navStudentCount" class="nav-count font-mono">0</span>
+        </button>
+
+        <button class="nav-btn" data-tab="fees" type="button">
+          <span class="nav-btn-left">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            <span>Fee Management</span>
+          </span>
+          <span id="navDueCount" class="nav-count font-mono">0</span>
+        </button>
+
+        <button class="nav-btn" data-tab="reports" type="button">
+          <span class="nav-btn-left">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Reports</span>
+          </span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="display:flex; align-items:center; gap:7px; color:var(--text-secondary);">
+          <i class="fa-solid fa-database" style="color:var(--accent-green);"></i>
+          <span>Simulated DB: <code class="font-mono" style="color:#ffffff;">localStorage</code></span>
+        </div>
+        <button id="resetSampleDbBtn" class="btn btn-sm btn-red" type="button">
+          <i class="fa-solid fa-rotate"></i>
+          <span>Reset Demo Database</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Open menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div>
+            <h1 id="pageTitle">Student Directory</h1>
+            <p id="pageSubtitle">Enroll students, track active vs. struck-off records, and manage batches</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="topAddStudentBtn" class="btn btn-green" type="button">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Add Student</span>
+          </button>
+          <button id="topGenerateInvoicesBtn" class="btn" type="button">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-green);"></i>
+            <span>Generate Monthly Invoices</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="content-container">
+        <!-- ===================== TAB 1: STUDENTS ===================== -->
+        <section id="tabStudents" style="display:flex; flex-direction:column; gap:18px;">
+          <div class="stats-grid-3">
+            <div class="stat-card accent-green">
+              <div class="stat-head">
+                <span class="stat-title">Active Students</span>
+                <div class="stat-icon icon-green"><i class="fa-solid fa-user-check"></i></div>
+              </div>
+              <div id="stuStatActive" class="stat-value font-mono" style="color:var(--accent-green);">0</div>
+              <div class="stat-sub">Eligible for monthly auto-invoicing</div>
+            </div>
+
+            <div class="stat-card accent-red">
+              <div class="stat-head">
+                <span class="stat-title">Struck Off (Inactive)</span>
+                <div class="stat-icon icon-red"><i class="fa-solid fa-user-slash"></i></div>
+              </div>
+              <div id="stuStatInactive" class="stat-value font-mono" style="color:var(--accent-red);">0</div>
+              <div class="stat-sub">Excluded from new monthly billing</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-head">
+                <span class="stat-title">Total Registered</span>
+                <div class="stat-icon icon-indigo"><i class="fa-solid fa-users"></i></div>
+              </div>
+              <div id="stuStatTotal" class="stat-value font-mono">0</div>
+              <div class="stat-sub">Historical + currently enrolled records</div>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">
+                  <i class="fa-solid fa-address-book"></i>
+                  <span>Student Directory</span>
+                </div>
+                <div class="panel-subtitle">Struck Off (Inactive) rows are highlighted with a red indicator and badge.</div>
+              </div>
+
+              <div class="toolbar-group">
+                <input id="studentSearchInput" type="text" class="control-input" style="width:230px;" placeholder="Search name, roll, or batch..." />
+                <select id="studentStatusFilter" class="control-select" style="width:150px;">
+                  <option value="All">Status: All</option>
+                  <option value="Active">Active Only</option>
+                  <option value="Inactive">Struck Off</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Batch</th>
+                    <th>Enrollment Date</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Action Buttons</th>
+                  </tr>
+                </thead>
+                <tbody id="studentsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== TAB 2: FEE MANAGEMENT ===================== -->
+        <section id="tabFees" class="hidden" style="display:flex; flex-direction:column; gap:18px;">
+          <!-- Top Stats -->
+          <div class="stats-grid-3">
+            <div class="stat-card accent-green">
+              <div class="stat-head">
+                <span class="stat-title">Total Collected</span>
+                <div class="stat-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+              <div id="feeStatCollected" class="stat-value font-mono" style="color:var(--accent-green);">Rs. 0</div>
+              <div id="feeStatCollectedSub" class="stat-sub">0 paid invoices</div>
+            </div>
+
+            <div class="stat-card accent-red">
+              <div class="stat-head">
+                <span class="stat-title">Total Due</span>
+                <div class="stat-icon icon-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              </div>
+              <div id="feeStatDue" class="stat-value font-mono" style="color:var(--accent-red);">Rs. 0</div>
+              <div id="feeStatDueSub" class="stat-sub">0 unpaid invoices</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-head">
+                <span class="stat-title">Total Active Students</span>
+                <div class="stat-icon icon-indigo"><i class="fa-solid fa-user-graduate"></i></div>
+              </div>
+              <div id="feeStatActiveStudents" class="stat-value font-mono">0</div>
+              <div class="stat-sub">Billed on Generate Monthly Invoices</div>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">
+                  <i class="fa-solid fa-receipt"></i>
+                  <span>Fee Dashboard &amp; Automated Billing</span>
+                </div>
+                <div class="panel-subtitle">Filter invoices by period or payment status, toggle Paid/Due, or print official fee slips.</div>
+              </div>
+
+              <button id="openGenerateModalBtn" class="btn btn-green" type="button">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Generate Monthly Invoices</span>
+              </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="toolbar">
+              <div class="toolbar-group">
+                <select id="feePeriodSelect" class="control-select" style="width:210px;">
+                  <option value="all">Period: All Invoices</option>
+                  <option value="current">Current Month</option>
+                  <option value="last6">Last 6 Months</option>
+                  <option value="custom">Custom Date Range</option>
+                </select>
+
+                <div id="feeCustomDateWrap" class="toolbar-group hidden">
+                  <input id="feeCustomStart" type="date" class="control-input font-mono" style="width:150px;" />
+                  <span style="color:var(--text-muted); font-size:12px;">to</span>
+                  <input id="feeCustomEnd" type="date" class="control-input font-mono" style="width:150px;" />
+                </div>
+              </div>
+
+              <div class="toolbar-group">
+                <input id="feeSearchInput" type="text" class="control-input" style="width:190px;" placeholder="Search student..." />
+                <div class="tab-pills" role="tablist" aria-label="Invoice status filter">
+                  <button class="tab-pill-btn active" data-fee-status="All" type="button">All</button>
+                  <button class="tab-pill-btn" data-fee-status="Paid" type="button">Paid Students</button>
+                  <button class="tab-pill-btn" data-fee-status="Unpaid" type="button">Due Students</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Invoices Table -->
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Month</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="feesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== TAB 3: REPORTS ===================== -->
+        <section id="tabReports" class="hidden" style="display:flex; flex-direction:column; gap:18px;">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>Revenue &amp; Collection Reports</span>
+                </div>
+                <div class="panel-subtitle">Analyze revenue generated and paid vs. unpaid student counts over any custom date range.</div>
+              </div>
+
+              <div class="toolbar-group">
+                <button class="btn btn-sm" data-range-preset="1" type="button">1 Month</button>
+                <button class="btn btn-sm" data-range-preset="3" type="button">3 Months</button>
+                <button class="btn btn-sm" data-range-preset="6" type="button">6 Months</button>
+              </div>
+            </div>
+
+            <div class="toolbar">
+              <div class="toolbar-group">
+                <label for="reportStartDate" style="font-size:12px; color:var(--text-secondary); font-weight:600;">Start Date:</label>
+                <input id="reportStartDate" type="date" class="control-input font-mono" style="width:165px;" />
+                <label for="reportEndDate" style="font-size:12px; color:var(--text-secondary); font-weight:600;">End Date:</label>
+                <input id="reportEndDate" type="date" class="control-input font-mono" style="width:165px;" />
+              </div>
+
+              <button id="exportReportCsvBtn" class="btn btn-sm" type="button">
+                <i class="fa-solid fa-file-csv" style="color:var(--accent-green);"></i>
+                <span>Export Range CSV</span>
+              </button>
+            </div>
+
+            <div class="stats-grid-4">
+              <div class="stat-card accent-green">
+                <div class="stat-head">
+                  <span class="stat-title">Revenue Generated</span>
+                  <div class="stat-icon icon-green"><i class="fa-solid fa-sack-dollar"></i></div>
+                </div>
+                <div id="repRevenue" class="stat-value font-mono" style="color:var(--accent-green);">Rs. 0</div>
+                <div id="repBilledSub" class="stat-sub">Total Billed: Rs. 0</div>
+              </div>
+
+              <div class="stat-card accent-red">
+                <div class="stat-head">
+                  <span class="stat-title">Outstanding Due</span>
+                  <div class="stat-icon icon-red"><i class="fa-solid fa-hourglass-half"></i></div>
+                </div>
+                <div id="repOutstanding" class="stat-value font-mono" style="color:var(--accent-red);">Rs. 0</div>
+                <div class="stat-sub">Pending fees in range</div>
+              </div>
+
+              <div class="stat-card accent-green">
+                <div class="stat-head">
+                  <span class="stat-title">Students Who Paid</span>
+                  <div class="stat-icon icon-green"><i class="fa-solid fa-user-check"></i></div>
+                </div>
+                <div id="repPaidStudents" class="stat-value font-mono" style="color:var(--accent-green);">0</div>
+                <div class="stat-sub">Unique students with paid invoices</div>
+              </div>
+
+              <div class="stat-card accent-red">
+                <div class="stat-head">
+                  <span class="stat-title">Students Unpaid</span>
+                  <div class="stat-icon icon-red"><i class="fa-solid fa-user-xmark"></i></div>
+                </div>
+                <div id="repUnpaidStudents" class="stat-value font-mono" style="color:var(--accent-red);">0</div>
+                <div class="stat-sub">Unique students with due invoices</div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Invoice ID</th>
+                    <th>Student Name</th>
+                    <th>Month</th>
+                    <th>Issue Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="reportsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: ADD / EDIT STUDENT ===================== -->
+  <div id="studentModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 id="studentModalTitle">Add New Student</h3>
+        <button id="closeStudentModalBtn" class="btn btn-sm" type="button" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="studentForm">
+        <div class="modal-body">
+          <input type="hidden" id="stuEditId" />
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="stuFullName">Full Name *</label>
+              <input id="stuFullName" type="text" class="control-input" placeholder="e.g., Muhammad Ahmad" required />
+            </div>
+
+            <div class="form-field">
+              <label for="stuFatherName">Father Name *</label>
+              <input id="stuFatherName" type="text" class="control-input" placeholder="e.g., Tariq Mahmood" required />
+            </div>
+
+            <div class="form-field">
+              <label for="stuPhone">Phone *</label>
+              <input id="stuPhone" type="tel" class="control-input font-mono" placeholder="+92 300 1234567" required />
+            </div>
+
+            <div class="form-field">
+              <label for="stuBatch">Class / Batch *</label>
+              <input id="stuBatch" type="text" class="control-input" placeholder="e.g., Morning Batch (TOPIK I)" required />
+            </div>
+
+            <div class="form-field">
+              <label for="stuEnrollDate">Date Enrolled *</label>
+              <input id="stuEnrollDate" type="date" class="control-input font-mono" required />
+            </div>
+
+            <div class="form-field">
+              <label for="stuStatus">Status *</label>
+              <select id="stuStatus" class="control-select">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive (Struck Off)</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="stuStruckOffDate">Date Struck Off (Optional)</label>
+              <input id="stuStruckOffDate" type="date" class="control-input font-mono" />
+            </div>
+
+            <div class="form-field">
+              <label for="stuMonthlyFee">Monthly Tuition Fee (PKR)</label>
+              <input id="stuMonthlyFee" type="number" min="0" class="control-input font-mono" value="15000" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button id="cancelStudentModalBtn" class="btn" type="button">Cancel</button>
+          <button type="submit" class="btn btn-green">
+            <i class="fa-solid fa-check"></i>
+            <span id="saveStudentBtnLabel">Save Student</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: VIEW STUDENT PROFILE ===================== -->
+  <div id="viewStudentModal" class="modal-backdrop hidden">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-head">
+        <h3>Student Profile Details</h3>
+        <button id="closeViewStudentBtn" class="btn btn-sm" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="viewStudentBody" class="modal-body"></div>
+      <div class="modal-foot">
+        <button id="viewEditTriggerBtn" class="btn btn-green" type="button">
+          <i class="fa-solid fa-pen"></i>
+          <span>Edit Student</span>
+        </button>
+        <button id="closeViewStudentFooterBtn" class="btn" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: GENERATE MONTHLY INVOICES ===================== -->
+  <div id="generateModal" class="modal-backdrop hidden">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-head">
+        <h3>Generate Monthly Invoices</h3>
+        <button id="closeGenerateModalBtn" class="btn btn-sm" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="generateInvoicesForm">
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="padding:12px; border-radius:10px; background:var(--accent-green-soft); border:1px solid rgba(16,185,129,0.35); font-size:12.5px; color:#d1fae5;">
+            Automatically creates one invoice for every <strong>Active</strong> student for the chosen month. Duplicate invoices for the same student &amp; month are skipped automatically.
+          </div>
+
+          <div class="form-field">
+            <label for="genMonthInput">Select Month / Year *</label>
+            <input id="genMonthInput" type="month" class="control-input font-mono" required />
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="genIssueDateInput">Issue Date *</label>
+              <input id="genIssueDateInput" type="date" class="control-input font-mono" required />
+            </div>
+
+            <div class="form-field">
+              <label for="genDueDateInput">Due Date *</label>
+              <input id="genDueDateInput" type="date" class="control-input font-mono" required />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="genAmountInput">Default Fee Amount (if student has none set)</label>
+            <input id="genAmountInput" type="number" min="1" class="control-input font-mono" value="15000" required />
+          </div>
+
+          <div id="genPreviewSummary" style="font-size:12px; color:var(--text-secondary);"></div>
+        </div>
+        <div class="modal-foot">
+          <button id="cancelGenerateModalBtn" class="btn" type="button">Cancel</button>
+          <button type="submit" class="btn btn-green">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Confirm &amp; Generate</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: PRINTABLE FEE SLIP ===================== -->
+  <div id="printSlipModal" class="modal-backdrop hidden">
+    <div class="modal-box" style="max-width:580px;">
+      <div class="modal-head no-print">
+        <h3>Printable Official Fee Slip</h3>
+        <button id="closePrintModalBtn" class="btn btn-sm" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div id="printSlipArea" class="slip-paper"></div>
+      </div>
+      <div class="modal-foot no-print">
+        <button id="closePrintFooterBtn" class="btn" type="button">Close</button>
+        <button id="triggerPrintBtn" class="btn btn-green" type="button">
+          <i class="fa-solid fa-print"></i>
+          <span>Print Slip</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastStack" class="toast-stack" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // LOCALSTORAGE KEYS & SEED DATA
+      // =========================================================================
+      var STORAGE_KEYS = {
+        STUDENTS: 'lms_sfm_students_v1',
+        INVOICES: 'lms_sfm_invoices_v1'
+      };
+
+      function safeGet(key, fallback) {
+        try {
+          var raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (err) {
+          return fallback;
+        }
+      }
+
+      function safeSet(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (err) {
+          console.warn('localStorage write failed:', err);
+        }
+      }
+
+      function formatDateISO(d) {
+        var dt = d instanceof Date ? d : new Date(d);
+        return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      }
+
+      function getCurrentMonthKey() {
+        var now = new Date();
+        return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      }
+
+      function offsetMonthKey(monthsBack) {
+        var d = new Date();
+        d.setDate(1);
+        d.setMonth(d.getMonth() - monthsBack);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      }
+
+      function formatMonthLabel(monthKey) {
+        if (!monthKey || monthKey.indexOf('-') === -1) return monthKey || '—';
+        var parts = monthKey.split('-');
+        var d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+        return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      }
+
+      function formatCurrency(num) {
+        return 'Rs. ' + Number(num || 0).toLocaleString('en-US');
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function seedDatabaseIfEmpty() {
+        var curMonth = getCurrentMonthKey();
+        var prevMonth = offsetMonthKey(1);
+
+        var existingStudents = safeGet(STORAGE_KEYS.STUDENTS, null);
+        if (!Array.isArray(existingStudents)) {
+          var sampleStudents = [
+            {
+              id: 'stu_1',
+              rollNo: 'OK-2026-001',
+              name: 'Muhammad Ahmad',
+              fatherName: 'Tariq Mahmood',
+              phone: '+92 300 5550101',
+              batch: 'Morning Batch (TOPIK I)',
+              enrollmentDate: '2026-08-12',
+              struckOffDate: '',
+              status: 'Active',
+              monthlyFee: 15000
+            },
+            {
+              id: 'stu_2',
+              rollNo: 'OK-2026-002',
+              name: 'Abdul Rehman',
+              fatherName: 'Muhammad Ilyas',
+              phone: '+92 301 5550102',
+              batch: 'Morning Batch (TOPIK I)',
+              enrollmentDate: '2026-09-03',
+              struckOffDate: '',
+              status: 'Active',
+              monthlyFee: 15000
+            },
+            {
+              id: 'stu_3',
+              rollNo: 'OK-2026-003',
+              name: 'Abdul-Rafay',
+              fatherName: 'Sajid Hussain',
+              phone: '+92 302 5550103',
+              batch: 'Evening Batch (EPS Prep)',
+              enrollmentDate: '2026-09-15',
+              struckOffDate: '',
+              status: 'Active',
+              monthlyFee: 18000
+            },
+            {
+              id: 'stu_4',
+              rollNo: 'OK-2026-004',
+              name: 'Zainab Fatima',
+              fatherName: 'Imran Qureshi',
+              phone: '+92 304 5550104',
+              batch: 'Evening Batch (TOPIK II)',
+              enrollmentDate: '2026-07-20',
+              struckOffDate: '2026-10-18',
+              status: 'Inactive',
+              monthlyFee: 15000
+            }
+          ];
+          safeSet(STORAGE_KEYS.STUDENTS, sampleStudents);
+        }
+
+        var existingInvoices = safeGet(STORAGE_KEYS.INVOICES, null);
+        if (!Array.isArray(existingInvoices)) {
+          var sampleInvoices = [
+            {
+              invoiceId: 'INV-' + prevMonth.replace('-', '') + '-001',
+              studentId: 'stu_1',
+              month: prevMonth,
+              amount: 15000,
+              status: 'Paid',
+              issueDate: prevMonth + '-01',
+              dueDate: prevMonth + '-10',
+              paidDate: prevMonth + '-05'
+            },
+            {
+              invoiceId: 'INV-' + prevMonth.replace('-', '') + '-002',
+              studentId: 'stu_2',
+              month: prevMonth,
+              amount: 15000,
+              status: 'Paid',
+              issueDate: prevMonth + '-01',
+              dueDate: prevMonth + '-10',
+              paidDate: prevMonth + '-08'
+            },
+            {
+              invoiceId: 'INV-' + curMonth.replace('-', '') + '-001',
+              studentId: 'stu_1',
+              month: curMonth,
+              amount: 15000,
+              status: 'Paid',
+              issueDate: curMonth + '-01',
+              dueDate: curMonth + '-10',
+              paidDate: curMonth + '-04'
+            },
+            {
+              invoiceId: 'INV-' + curMonth.replace('-', '') + '-002',
+              studentId: 'stu_2',
+              month: curMonth,
+              amount: 15000,
+              status: 'Unpaid',
+              issueDate: curMonth + '-01',
+              dueDate: curMonth + '-10',
+              paidDate: ''
+            },
+            {
+              invoiceId: 'INV-' + curMonth.replace('-', '') + '-003',
+              studentId: 'stu_3',
+              month: curMonth,
+              amount: 18000,
+              status: 'Unpaid',
+              issueDate: curMonth + '-01',
+              dueDate: curMonth + '-10',
+              paidDate: ''
+            }
+          ];
+          safeSet(STORAGE_KEYS.INVOICES, sampleInvoices);
+        }
+      }
+
+      // =========================================================================
+      // STATE & DOM REFERENCES
+      // =========================================================================
+      seedDatabaseIfEmpty();
+
+      var activeTab = 'students';
+      var activeFeeStatusFilter = 'All';
+      var viewingStudentId = null;
+
+      var els = {
+        sidebar: document.getElementById('sidebar'),
+        sidebarBackdrop: document.getElementById('sidebarBackdrop'),
+        mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+        sidebarCloseBtn: document.getElementById('sidebarCloseBtn'),
+        navStudentCount: document.getElementById('navStudentCount'),
+        navDueCount: document.getElementById('navDueCount'),
+        resetSampleDbBtn: document.getElementById('resetSampleDbBtn'),
+
+        pageTitle: document.getElementById('pageTitle'),
+        pageSubtitle: document.getElementById('pageSubtitle'),
+        topAddStudentBtn: document.getElementById('topAddStudentBtn'),
+        topGenerateInvoicesBtn: document.getElementById('topGenerateInvoicesBtn'),
+
+        tabStudents: document.getElementById('tabStudents'),
+        tabFees: document.getElementById('tabFees'),
+        tabReports: document.getElementById('tabReports'),
+
+        stuStatActive: document.getElementById('stuStatActive'),
+        stuStatInactive: document.getElementById('stuStatInactive'),
+        stuStatTotal: document.getElementById('stuStatTotal'),
+        studentSearchInput: document.getElementById('studentSearchInput'),
+        studentStatusFilter: document.getElementById('studentStatusFilter'),
+        studentsTableBody: document.getElementById('studentsTableBody'),
+
+        feeStatCollected: document.getElementById('feeStatCollected'),
+        feeStatCollectedSub: document.getElementById('feeStatCollectedSub'),
+        feeStatDue: document.getElementById('feeStatDue'),
+        feeStatDueSub: document.getElementById('feeStatDueSub'),
+        feeStatActiveStudents: document.getElementById('feeStatActiveStudents'),
+        openGenerateModalBtn: document.getElementById('openGenerateModalBtn'),
+        feePeriodSelect: document.getElementById('feePeriodSelect'),
+        feeCustomDateWrap: document.getElementById('feeCustomDateWrap'),
+        feeCustomStart: document.getElementById('feeCustomStart'),
+        feeCustomEnd: document.getElementById('feeCustomEnd'),
+        feeSearchInput: document.getElementById('feeSearchInput'),
+        feesTableBody: document.getElementById('feesTableBody'),
+
+        reportStartDate: document.getElementById('reportStartDate'),
+        reportEndDate: document.getElementById('reportEndDate'),
+        exportReportCsvBtn: document.getElementById('exportReportCsvBtn'),
+        repRevenue: document.getElementById('repRevenue'),
+        repBilledSub: document.getElementById('repBilledSub'),
+        repOutstanding: document.getElementById('repOutstanding'),
+        repPaidStudents: document.getElementById('repPaidStudents'),
+        repUnpaidStudents: document.getElementById('repUnpaidStudents'),
+        reportsTableBody: document.getElementById('reportsTableBody'),
+
+        studentModal: document.getElementById('studentModal'),
+        studentModalTitle: document.getElementById('studentModalTitle'),
+        studentForm: document.getElementById('studentForm'),
+        stuEditId: document.getElementById('stuEditId'),
+        stuFullName: document.getElementById('stuFullName'),
+        stuFatherName: document.getElementById('stuFatherName'),
+        stuPhone: document.getElementById('stuPhone'),
+        stuBatch: document.getElementById('stuBatch'),
+        stuEnrollDate: document.getElementById('stuEnrollDate'),
+        stuStatus: document.getElementById('stuStatus'),
+        stuStruckOffDate: document.getElementById('stuStruckOffDate'),
+        stuMonthlyFee: document.getElementById('stuMonthlyFee'),
+        saveStudentBtnLabel: document.getElementById('saveStudentBtnLabel'),
+        closeStudentModalBtn: document.getElementById('closeStudentModalBtn'),
+        cancelStudentModalBtn: document.getElementById('cancelStudentModalBtn'),
+
+        viewStudentModal: document.getElementById('viewStudentModal'),
+        viewStudentBody: document.getElementById('viewStudentBody'),
+        closeViewStudentBtn: document.getElementById('closeViewStudentBtn'),
+        closeViewStudentFooterBtn: document.getElementById('closeViewStudentFooterBtn'),
+        viewEditTriggerBtn: document.getElementById('viewEditTriggerBtn'),
+
+        generateModal: document.getElementById('generateModal'),
+        generateInvoicesForm: document.getElementById('generateInvoicesForm'),
+        genMonthInput: document.getElementById('genMonthInput'),
+        genIssueDateInput: document.getElementById('genIssueDateInput'),
+        genDueDateInput: document.getElementById('genDueDateInput'),
+        genAmountInput: document.getElementById('genAmountInput'),
+        genPreviewSummary: document.getElementById('genPreviewSummary'),
+        closeGenerateModalBtn: document.getElementById('closeGenerateModalBtn'),
+        cancelGenerateModalBtn: document.getElementById('cancelGenerateModalBtn'),
+
+        printSlipModal: document.getElementById('printSlipModal'),
+        printSlipArea: document.getElementById('printSlipArea'),
+        closePrintModalBtn: document.getElementById('closePrintModalBtn'),
+        closePrintFooterBtn: document.getElementById('closePrintFooterBtn'),
+        triggerPrintBtn: document.getElementById('triggerPrintBtn'),
+
+        toastStack: document.getElementById('toastStack')
+      };
+
+      function getStudents() {
+        return safeGet(STORAGE_KEYS.STUDENTS, []);
+      }
+
+      function getInvoices() {
+        return safeGet(STORAGE_KEYS.INVOICES, []);
+      }
+
+      function showToast(msg, isError) {
+        var div = document.createElement('div');
+        div.className = 'toast';
+        div.style.borderColor = isError ? 'rgba(239,68,68,0.5)' : 'rgba(16,185,129,0.5)';
+        div.innerHTML =
+          '<i class="' + (isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check') + '" style="color:' + (isError ? 'var(--accent-red)' : 'var(--accent-green)') + ';"></i>' +
+          '<span>' + escapeHtml(msg) + '</span>';
+        els.toastStack.appendChild(div);
+        setTimeout(function () {
+          if (div.parentNode) div.parentNode.removeChild(div);
+        }, 3200);
+      }
+
+      // =========================================================================
+      // STUDENTS RENDERING & CRUD
+      // =========================================================================
+      function generateNextRollNo(students) {
+        var year = new Date().getFullYear();
+        var maxSeq = 0;
+        students.forEach(function (s) {
+          var m = String(s.rollNo || '').match(/(\d+)$/);
+          if (m) {
+            var n = parseInt(m[1], 10);
+            if (n > maxSeq) maxSeq = n;
+          }
+        });
+        return 'OK-' + year + '-' + String(maxSeq + 1).padStart(3, '0');
+      }
+
+      function renderStudentsTab() {
+        var students = getStudents();
+        var activeCount = students.filter(function (s) { return s.status === 'Active'; }).length;
+        var inactiveCount = students.length - activeCount;
+
+        els.stuStatActive.textContent = String(activeCount);
+        els.stuStatInactive.textContent = String(inactiveCount);
+        els.stuStatTotal.textContent = String(students.length);
+        els.navStudentCount.textContent = String(students.length);
+
+        var q = els.studentSearchInput.value.trim().toLowerCase();
+        var statusFilter = els.studentStatusFilter.value;
+
+        var filtered = students.filter(function (s) {
+          if (statusFilter !== 'All' && s.status !== statusFilter) return false;
+          if (!q) return true;
+          return (
+            String(s.name || '').toLowerCase().indexOf(q) !== -1 ||
+            String(s.rollNo || '').toLowerCase().indexOf(q) !== -1 ||
+            String(s.batch || '').toLowerCase().indexOf(q) !== -1 ||
+            String(s.fatherName || '').toLowerCase().indexOf(q) !== -1
+          );
+        });
+
+        if (filtered.length === 0) {
+          els.studentsTableBody.innerHTML =
+            '<tr><td colspan="6" class="empty-box"><i class="fa-regular fa-folder-open" style="font-size:20px; display:block; margin-bottom:8px;"></i>No matching student records found.</td></tr>';
+          return;
+        }
+
+        els.studentsTableBody.innerHTML = filtered
+          .map(function (s) {
+            var isInactive = s.status !== 'Active';
+            var rowClass = isInactive ? 'row-struck-off' : '';
+            var statusHtml = isInactive
+              ? '<span class="badge badge-inactive"><i class="fa-solid fa-user-slash"></i> Struck Off (Inactive)</span>'
+              : '<span class="badge badge-active"><i class="fa-solid fa-circle-check"></i> Active</span>';
+
+            return (
+              '<tr class="' + rowClass + '">' +
+                '<td><span class="roll-chip font-mono">' + escapeHtml(s.rollNo) + '</span></td>' +
+                '<td>' +
+                  '<div style="font-weight:700; color:#ffffff;">' + escapeHtml(s.name) + '</div>' +
+                  '<div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">S/O ' + escapeHtml(s.fatherName) + ' &middot; <span class="font-mono">' + escapeHtml(s.phone) + '</span></div>' +
+                '</td>' +
+                '<td style="color:var(--text-secondary);">' + escapeHtml(s.batch) + '</td>' +
+                '<td>' +
+                  '<div class="font-mono" style="color:var(--text-secondary);">' + escapeHtml(s.enrollmentDate) + '</div>' +
+                  (s.struckOffDate ? '<div class="font-mono" style="font-size:11px; color:#f87171;">Struck Off: ' + escapeHtml(s.struckOffDate) + '</div>' : '') +
+                '</td>' +
+                '<td>' + statusHtml + '</td>' +
+                '<td style="text-align:right; white-space:nowrap;">' +
+                  '<button class="btn btn-sm" data-view-stu="' + escapeHtml(s.id) + '" type="button" style="margin-right:6px;">' +
+                    '<i class="fa-regular fa-eye"></i><span>View</span>' +
+                  '</button>' +
+                  '<button class="btn btn-sm" data-edit-stu="' + escapeHtml(s.id) + '" type="button">' +
+                    '<i class="fa-solid fa-pen"></i><span>Edit</span>' +
+                  '</button>' +
+                '</td>' +
+              '</tr>'
+            );
+          })
+          .join('');
+
+        Array.prototype.forEach.call(els.studentsTableBody.querySelectorAll('[data-view-stu]'), function (btn) {
+          btn.addEventListener('click', function () {
+            openViewStudentModal(btn.getAttribute('data-view-stu'));
+          });
+        });
+        Array.prototype.forEach.call(els.studentsTableBody.querySelectorAll('[data-edit-stu]'), function (btn) {
+          btn.addEventListener('click', function () {
+            openStudentModal(btn.getAttribute('data-edit-stu'));
+          });
+        });
+      }
+
+      function openStudentModal(editId) {
+        var students = getStudents();
+        var stu = editId ? students.find(function (s) { return s.id === editId; }) : null;
+
+        if (stu) {
+          els.studentModalTitle.textContent = 'Edit Student (' + stu.rollNo + ')';
+          els.saveStudentBtnLabel.textContent = 'Update Student';
+          els.stuEditId.value = stu.id;
+          els.stuFullName.value = stu.name || '';
+          els.stuFatherName.value = stu.fatherName || '';
+          els.stuPhone.value = stu.phone || '';
+          els.stuBatch.value = stu.batch || '';
+          els.stuEnrollDate.value = stu.enrollmentDate || formatDateISO(new Date());
+          els.stuStatus.value = stu.status || 'Active';
+          els.stuStruckOffDate.value = stu.struckOffDate || '';
+          els.stuMonthlyFee.value = String(stu.monthlyFee || 15000);
+        } else {
+          els.studentModalTitle.textContent = 'Add New Student';
+          els.saveStudentBtnLabel.textContent = 'Save Student';
+          els.stuEditId.value = '';
+          els.stuFullName.value = '';
+          els.stuFatherName.value = '';
+          els.stuPhone.value = '';
+          els.stuBatch.value = 'Morning Batch (TOPIK I)';
+          els.stuEnrollDate.value = formatDateISO(new Date());
+          els.stuStatus.value = 'Active';
+          els.stuStruckOffDate.value = '';
+          els.stuMonthlyFee.value = '15000';
+        }
+        els.studentModal.classList.remove('hidden');
+      }
+
+      function closeStudentModal() {
+        els.studentModal.classList.add('hidden');
+      }
+
+      function openViewStudentModal(studentId) {
+        var stu = getStudents().find(function (s) { return s.id === studentId; });
+        if (!stu) return;
+        viewingStudentId = stu.id;
+
+        var invoices = getInvoices().filter(function (inv) { return inv.studentId === stu.id; });
+        var paidTotal = invoices.filter(function (i) { return i.status === 'Paid'; }).reduce(function (a, i) { return a + Number(i.amount || 0); }, 0);
+        var dueTotal = invoices.filter(function (i) { return i.status !== 'Paid'; }).reduce(function (a, i) { return a + Number(i.amount || 0); }, 0);
+
+        els.viewStudentBody.innerHTML =
+          '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:8px;">' +
+            '<div>' +
+              '<div style="font-size:18px; font-weight:800;">' + escapeHtml(stu.name) + '</div>' +
+              '<div class="font-mono" style="font-size:12px; color:var(--text-secondary);">Roll: ' + escapeHtml(stu.rollNo) + ' &middot; ' + escapeHtml(stu.batch) + '</div>' +
+            '</div>' +
+            (stu.status === 'Active'
+              ? '<span class="badge badge-active"><i class="fa-solid fa-circle-check"></i> Active</span>'
+              : '<span class="badge badge-inactive"><i class="fa-solid fa-user-slash"></i> Struck Off (Inactive)</span>') +
+          '</div>' +
+          '<div class="form-grid" style="font-size:12.5px;">' +
+            '<div style="padding:12px; border-radius:10px; background:#121216; border:1px solid var(--border-subtle);"><div style="color:var(--text-muted); font-size:11px;">Father Name</div><div style="font-weight:600; margin-top:3px;">' + escapeHtml(stu.fatherName) + '</div></div>' +
+            '<div style="padding:12px; border-radius:10px; background:#121216; border:1px solid var(--border-subtle);"><div style="color:var(--text-muted); font-size:11px;">Phone</div><div class="font-mono" style="font-weight:600; margin-top:3px;">' + escapeHtml(stu.phone) + '</div></div>' +
+            '<div style="padding:12px; border-radius:10px; background:#121216; border:1px solid var(--border-subtle);"><div style="color:var(--text-muted); font-size:11px;">Date Enrolled</div><div class="font-mono" style="font-weight:600; margin-top:3px;">' + escapeHtml(stu.enrollmentDate) + '</div></div>' +
+            '<div style="padding:12px; border-radius:10px; background:#121216; border:1px solid var(--border-subtle);"><div style="color:var(--text-muted); font-size:11px;">Date Struck Off</div><div class="font-mono" style="font-weight:600; margin-top:3px; color:' + (stu.struckOffDate ? '#fca5a5' : 'inherit') + ';">' + escapeHtml(stu.struckOffDate || 'N/A') + '</div></div>' +
+            '<div style="padding:12px; border-radius:10px; background:#121216; border:1px solid rgba(16,185,129,0.35);"><div style="color:var(--text-muted); font-size:11px;">Total Fees Paid</div><div class="font-mono" style="font-weight:800; color:var(--accent-green); margin-top:3px;">' + formatCurrency(paidTotal) + '</div></div>' +
+            '<div style="padding:12px; border-radius:10px; background:#121216; border:1px solid rgba(239,68,68,0.35);"><div style="color:var(--text-muted); font-size:11px;">Pending Fees Due</div><div class="font-mono" style="font-weight:800; color:var(--accent-red); margin-top:3px;">' + formatCurrency(dueTotal) + '</div></div>' +
+          '</div>';
+
+        els.viewStudentModal.classList.remove('hidden');
+      }
+
+      // =========================================================================
+      // FEE MANAGEMENT, AUTOMATED GENERATION & PRINTABLE SLIP
+      // =========================================================================
+      function populatePeriodSelectOptions() {
+        var invoices = getInvoices();
+        var existingVal = els.feePeriodSelect.value || 'all';
+        var monthsSet = {};
+        invoices.forEach(function (inv) {
+          if (inv.month) monthsSet[inv.month] = true;
+        });
+        var monthKeys = Object.keys(monthsSet).sort().reverse();
+
+        var html =
+          '<option value="all">Period: All Invoices</option>' +
+          '<option value="current">Current Month (' + formatMonthLabel(getCurrentMonthKey()) + ')</option>' +
+          '<option value="last6">Last 6 Months</option>' +
+          '<option value="custom">Custom Date Range</option>';
+
+        monthKeys.forEach(function (mKey) {
+          html += '<option value="month:' + escapeHtml(mKey) + '">' + escapeHtml(formatMonthLabel(mKey)) + ' (' + escapeHtml(mKey) + ')</option>';
+        });
+
+        els.feePeriodSelect.innerHTML = html;
+        if (Array.prototype.some.call(els.feePeriodSelect.options, function (opt) { return opt.value === existingVal; })) {
+          els.feePeriodSelect.value = existingVal;
+        }
+      }
+
+      function filterInvoicesByPeriod(invoices) {
+        var period = els.feePeriodSelect.value;
+        var curMonth = getCurrentMonthKey();
+
+        if (period === 'current') {
+          return invoices.filter(function (inv) { return inv.month === curMonth; });
+        }
+        if (period === 'last6') {
+          var cutoffMonth = offsetMonthKey(5);
+          return invoices.filter(function (inv) { return inv.month >= cutoffMonth; });
+        }
+        if (period === 'custom') {
+          var startD = els.feeCustomStart.value;
+          var endD = els.feeCustomEnd.value;
+          return invoices.filter(function (inv) {
+            var dt = inv.issueDate || (inv.month + '-01');
+            if (startD && dt < startD) return false;
+            if (endD && dt > endD) return false;
+            return true;
+          });
+        }
+        if (period.indexOf('month:') === 0) {
+          var targetMonth = period.slice(6);
+          return invoices.filter(function (inv) { return inv.month === targetMonth; });
+        }
+        return invoices;
+      }
+
+      function renderFeesTab() {
+        populatePeriodSelectOptions();
+
+        var students = getStudents();
+        var studentMap = {};
+        students.forEach(function (s) { studentMap[s.id] = s; });
+
+        var invoices = getInvoices();
+        var allDueCount = invoices.filter(function (i) { return i.status !== 'Paid'; }).length;
+        els.navDueCount.textContent = String(allDueCount);
+
+        var periodFiltered = filterInvoicesByPeriod(invoices);
+
+        var collectedSum = 0;
+        var collectedCount = 0;
+        var dueSum = 0;
+        var dueCount = 0;
+
+        periodFiltered.forEach(function (inv) {
+          if (inv.status === 'Paid') {
+            collectedSum += Number(inv.amount || 0);
+            collectedCount++;
+          } else {
+            dueSum += Number(inv.amount || 0);
+            dueCount++;
+          }
+        });
+
+        var activeStudentsCount = students.filter(function (s) { return s.status === 'Active'; }).length;
+
+        els.feeStatCollected.textContent = formatCurrency(collectedSum);
+        els.feeStatCollectedSub.textContent = collectedCount + ' paid invoice(s) in selected view';
+        els.feeStatDue.textContent = formatCurrency(dueSum);
+        els.feeStatDueSub.textContent = dueCount + ' unpaid invoice(s) in selected view';
+        els.feeStatActiveStudents.textContent = String(activeStudentsCount);
+
+        var q = els.feeSearchInput.value.trim().toLowerCase();
+        var finalRows = periodFiltered.filter(function (inv) {
+          if (activeFeeStatusFilter === 'Paid' && inv.status !== 'Paid') return false;
+          if (activeFeeStatusFilter === 'Unpaid' && inv.status === 'Paid') return false;
+          if (q) {
+            var stu = studentMap[inv.studentId];
+            var stuName = stu ? stu.name : '';
+            var rollNo = stu ? stu.rollNo : '';
+            if (
+              stuName.toLowerCase().indexOf(q) === -1 &&
+              rollNo.toLowerCase().indexOf(q) === -1 &&
+              String(inv.invoiceId || '').toLowerCase().indexOf(q) === -1
+            ) {
+              return false;
+            }
+          }
+          return true;
+        });
+
+        if (finalRows.length === 0) {
+          els.feesTableBody.innerHTML =
+            '<tr><td colspan="5" class="empty-box"><i class="fa-regular fa-file-excel" style="font-size:20px; display:block; margin-bottom:8px;"></i>No fee invoices match your current filters.</td></tr>';
+          return;
+        }
+
+        els.feesTableBody.innerHTML = finalRows
+          .map(function (inv) {
+            var stu = studentMap[inv.studentId];
+            var stuName = stu ? stu.name : 'Archived Student';
+            var stuMeta = stu ? stu.rollNo + ' · ' + stu.batch : inv.studentId;
+            var isPaid = inv.status === 'Paid';
+
+            return (
+              '<tr>' +
+                '<td>' +
+                  '<div style="font-weight:700; color:#ffffff;">' + escapeHtml(stuName) + '</div>' +
+                  '<div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">' +
+                    '<span class="font-mono">' + escapeHtml(inv.invoiceId) + '</span> &middot; ' + escapeHtml(stuMeta) +
+                  '</div>' +
+                '</td>' +
+                '<td>' +
+                  '<div style="font-weight:600;">' + escapeHtml(formatMonthLabel(inv.month)) + '</div>' +
+                  '<div class="font-mono" style="font-size:11px; color:var(--text-muted);">Due: ' + escapeHtml(inv.dueDate || '—') + '</div>' +
+                '</td>' +
+                '<td class="font-mono" style="font-weight:800;">' + formatCurrency(inv.amount) + '</td>' +
+                '<td>' +
+                  (isPaid
+                    ? '<span class="badge badge-active"><i class="fa-solid fa-check"></i> Paid</span>'
+                    : '<span class="badge badge-inactive"><i class="fa-solid fa-clock"></i> Due (Unpaid)</span>') +
+                '</td>' +
+                '<td style="text-align:right; white-space:nowrap;">' +
+                  '<button class="btn btn-sm ' + (isPaid ? '' : 'btn-green') + '" data-toggle-inv="' + escapeHtml(inv.invoiceId) + '" type="button" style="margin-right:6px;">' +
+                    '<i class="fa-solid ' + (isPaid ? 'fa-rotate-left' : 'fa-check') + '"></i>' +
+                    '<span>' + (isPaid ? 'Mark Due' : 'Mark Paid') + '</span>' +
+                  '</button>' +
+                  '<button class="btn btn-sm" data-print-inv="' + escapeHtml(inv.invoiceId) + '" type="button">' +
+                    '<i class="fa-solid fa-print"></i>' +
+                    '<span>Print Slip</span>' +
+                  '</button>' +
+                '</td>' +
+              '</tr>'
+            );
+          })
+          .join('');
+
+        Array.prototype.forEach.call(els.feesTableBody.querySelectorAll('[data-toggle-inv]'), function (btn) {
+          btn.addEventListener('click', function () {
+            toggleInvoiceStatus(btn.getAttribute('data-toggle-inv'));
+          });
+        });
+
+        Array.prototype.forEach.call(els.feesTableBody.querySelectorAll('[data-print-inv]'), function (btn) {
+          btn.addEventListener('click', function () {
+            openPrintSlipModal(btn.getAttribute('data-print-inv'));
+          });
+        });
+      }
+
+      function toggleInvoiceStatus(invoiceId) {
+        var invoices = getInvoices();
+        var updated = invoices.map(function (inv) {
+          if (inv.invoiceId !== invoiceId) return inv;
+          var nextStatus = inv.status === 'Paid' ? 'Unpaid' : 'Paid';
+          return Object.assign({}, inv, {
+            status: nextStatus,
+            paidDate: nextStatus === 'Paid' ? formatDateISO(new Date()) : ''
+          });
+        });
+        safeSet(STORAGE_KEYS.INVOICES, updated);
+        renderAll();
+        showToast('Invoice status updated in localStorage.');
+      }
+
+      function updateGenerateModalPreview() {
+        var monthKey = els.genMonthInput.value;
+        var activeStudents = getStudents().filter(function (s) { return s.status === 'Active'; });
+        var invoices = getInvoices();
+        var alreadyBilledCount = activeStudents.filter(function (s) {
+          return invoices.some(function (inv) { return inv.studentId === s.id && inv.month === monthKey; });
+        }).length;
+        var toCreate = activeStudents.length - alreadyBilledCount;
+        els.genPreviewSummary.innerHTML =
+          '<strong>' + activeStudents.length + '</strong> Active student(s) found &middot; ' +
+          '<strong style="color:var(--accent-green);">' + toCreate + '</strong> new invoice(s) will be generated' +
+          (alreadyBilledCount > 0 ? ' (' + alreadyBilledCount + ' duplicate(s) skipped).' : '.');
+      }
+
+      function openGenerateInvoicesModal() {
+        var curMonth = getCurrentMonthKey();
+        els.genMonthInput.value = curMonth;
+        els.genIssueDateInput.value = formatDateISO(new Date());
+        els.genDueDateInput.value = curMonth + '-10';
+        updateGenerateModalPreview();
+        els.generateModal.classList.remove('hidden');
+      }
+
+      function openPrintSlipModal(invoiceId) {
+        var inv = getInvoices().find(function (i) { return i.invoiceId === invoiceId; });
+        if (!inv) return;
+        var stu = getStudents().find(function (s) { return s.id === inv.studentId; });
+        var isPaid = inv.status === 'Paid';
+
+        els.printSlipArea.innerHTML =
+          '<div class="slip-header">' +
+            '<div>' +
+              '<div class="slip-logo">OK KOREAN LMS</div>' +
+              '<div class="slip-sub">OFFICIAL TUITION FEE RECEIPT &amp; PAYMENT SLIP</div>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<div class="font-mono" style="font-size:12px; font-weight:800;">' + escapeHtml(inv.invoiceId) + '</div>' +
+              '<div class="font-mono" style="font-size:11px; color:#52525b;">Issued: ' + escapeHtml(inv.issueDate || '—') + '</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="slip-grid">' +
+            '<div class="slip-cell"><span>Student Name</span><strong>' + escapeHtml(stu ? stu.name : 'Archived Student') + '</strong></div>' +
+            '<div class="slip-cell"><span>Roll Number</span><strong class="font-mono">' + escapeHtml(stu ? stu.rollNo : '—') + '</strong></div>' +
+            '<div class="slip-cell"><span>Class / Batch</span><strong>' + escapeHtml(stu ? stu.batch : '—') + '</strong></div>' +
+            '<div class="slip-cell"><span>Invoice Month</span><strong>' + escapeHtml(formatMonthLabel(inv.month)) + ' (' + escapeHtml(inv.month) + ')</strong></div>' +
+            '<div class="slip-cell"><span>Father / Guardian</span><strong>' + escapeHtml(stu ? stu.fatherName : '—') + '</strong></div>' +
+            '<div class="slip-cell"><span>Due Date</span><strong class="font-mono">' + escapeHtml(inv.dueDate || '—') + '</strong></div>' +
+          '</div>' +
+
+          '<div class="slip-amount-box">' +
+            '<div>' +
+              '<div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#52525b; font-weight:700;">Total Invoice Amount</div>' +
+              '<div class="font-mono" style="font-size:26px; font-weight:900; margin-top:2px;">' + formatCurrency(inv.amount) + ' PKR</div>' +
+              (isPaid && inv.paidDate ? '<div class="font-mono" style="font-size:11px; color:#059669; font-weight:700;">Cleared on: ' + escapeHtml(inv.paidDate) + '</div>' : '') +
+            '</div>' +
+            '<div class="slip-stamp ' + (isPaid ? 'stamp-paid' : 'stamp-unpaid') + '">' +
+              (isPaid ? 'PAID' : 'UNPAID') +
+            '</div>' +
+          '</div>' +
+
+          '<div class="slip-footer">' +
+            '<div>Generated electronically by OK Korean LMS Fee System</div>' +
+            '<div style="text-align:right;">Accounts Office Stamp &amp; Signature</div>' +
+          '</div>';
+
+        els.printSlipModal.classList.remove('hidden');
+      }
+
+      // =========================================================================
+      // REPORTS TAB (CUSTOM DATE RANGE)
+      // =========================================================================
+      function setReportPresetMonths(months) {
+        var end = new Date();
+        var start = new Date();
+        start.setMonth(start.getMonth() - months);
+        els.reportStartDate.value = formatDateISO(start);
+        els.reportEndDate.value = formatDateISO(end);
+        renderReportsTab();
+      }
+
+      function getReportRangeInvoices() {
+        var startD = els.reportStartDate.value;
+        var endD = els.reportEndDate.value;
+        return getInvoices().filter(function (inv) {
+          var dt = inv.issueDate || (inv.month + '-01');
+          if (startD && dt < startD) return false;
+          if (endD && dt > endD) return false;
+          return true;
+        });
+      }
+
+      function renderReportsTab() {
+        var students = getStudents();
+        var studentMap = {};
+        students.forEach(function (s) { studentMap[s.id] = s; });
+
+        var rows = getReportRangeInvoices();
+        var revenue = 0;
+        var billed = 0;
+        var outstanding = 0;
+        var paidStudentsSet = {};
+        var unpaidStudentsSet = {};
+
+        rows.forEach(function (inv) {
+          var amt = Number(inv.amount || 0);
+          billed += amt;
+          if (inv.status === 'Paid') {
+            revenue += amt;
+            paidStudentsSet[inv.studentId] = true;
+          } else {
+            outstanding += amt;
+            unpaidStudentsSet[inv.studentId] = true;
+          }
+        });
+
+        els.repRevenue.textContent = formatCurrency(revenue);
+        els.repBilledSub.textContent = 'Total Billed: ' + formatCurrency(billed);
+        els.repOutstanding.textContent = formatCurrency(outstanding);
+        els.repPaidStudents.textContent = String(Object.keys(paidStudentsSet).length);
+        els.repUnpaidStudents.textContent = String(Object.keys(unpaidStudentsSet).length);
+
+        if (rows.length === 0) {
+          els.reportsTableBody.innerHTML =
+            '<tr><td colspan="6" class="empty-box">No invoices found within the selected date range.</td></tr>';
+          return;
+        }
+
+        els.reportsTableBody.innerHTML = rows
+          .map(function (inv) {
+            var stu = studentMap[inv.studentId];
+            var isPaid = inv.status === 'Paid';
+            return (
+              '<tr>' +
+                '<td class="font-mono" style="font-weight:700;">' + escapeHtml(inv.invoiceId) + '</td>' +
+                '<td style="font-weight:600;">' + escapeHtml(stu ? stu.name : 'Archived Student') + '</td>' +
+                '<td>' + escapeHtml(formatMonthLabel(inv.month)) + '</td>' +
+                '<td class="font-mono" style="color:var(--text-secondary);">' + escapeHtml(inv.issueDate || '—') + '</td>' +
+                '<td class="font-mono" style="font-weight:700;">' + formatCurrency(inv.amount) + '</td>' +
+                '<td>' +
+                  (isPaid
+                    ? '<span class="badge badge-active"><i class="fa-solid fa-check"></i> Paid</span>'
+                    : '<span class="badge badge-inactive"><i class="fa-solid fa-clock"></i> Due (Unpaid)</span>') +
+                '</td>' +
+              '</tr>'
+            );
+          })
+          .join('');
+      }
+
+      // =========================================================================
+      // NAVIGATION & EVENT BINDINGS
+      // =========================================================================
+      var TAB_HEADERS = {
+        students: {
+          title: 'Student Directory',
+          sub: 'Enroll students, track active vs. struck-off records, and manage batches'
+        },
+        fees: {
+          title: 'Fee Management',
+          sub: 'Auto-generate monthly invoices for Active students, filter dues, and print slips'
+        },
+        reports: {
+          title: 'Financial & Payment Reports',
+          sub: 'Revenue generated and Paid vs. Unpaid student analysis across custom date ranges'
+        }
+      };
+
+      function switchTab(tabName) {
+        activeTab = tabName;
+        els.tabStudents.classList.toggle('hidden', tabName !== 'students');
+        els.tabFees.classList.toggle('hidden', tabName !== 'fees');
+        els.tabReports.classList.toggle('hidden', tabName !== 'reports');
+
+        Array.prototype.forEach.call(document.querySelectorAll('.nav-btn'), function (btn) {
+          btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+        });
+
+        if (TAB_HEADERS[tabName]) {
+          els.pageTitle.textContent = TAB_HEADERS[tabName].title;
+          els.pageSubtitle.textContent = TAB_HEADERS[tabName].sub;
+        }
+
+        els.sidebar.classList.remove('open');
+        els.sidebarBackdrop.classList.remove('open');
+        renderAll();
+      }
+
+      function renderAll() {
+        renderStudentsTab();
+        renderFeesTab();
+        renderReportsTab();
+      }
+
+      Array.prototype.forEach.call(document.querySelectorAll('.nav-btn'), function (btn) {
+        btn.addEventListener('click', function () {
+          switchTab(btn.getAttribute('data-tab') || 'students');
+        });
+      });
+
+      els.mobileMenuBtn.addEventListener('click', function () {
+        els.sidebar.classList.add('open');
+        els.sidebarBackdrop.classList.add('open');
+      });
+      els.sidebarCloseBtn.addEventListener('click', function () {
+        els.sidebar.classList.remove('open');
+        els.sidebarBackdrop.classList.remove('open');
+      });
+      els.sidebarBackdrop.addEventListener('click', function () {
+        els.sidebar.classList.remove('open');
+        els.sidebarBackdrop.classList.remove('open');
+      });
+
+      // Add/Edit Student Form
+      els.topAddStudentBtn.addEventListener('click', function () { openStudentModal(null); });
+      els.closeStudentModalBtn.addEventListener('click', closeStudentModal);
+      els.cancelStudentModalBtn.addEventListener('click', closeStudentModal);
+
+      els.stuStatus.addEventListener('change', function () {
+        if (els.stuStatus.value === 'Inactive' && !els.stuStruckOffDate.value) {
+          els.stuStruckOffDate.value = formatDateISO(new Date());
+        } else if (els.stuStatus.value === 'Active') {
+          els.stuStruckOffDate.value = '';
+        }
+      });
+
+      els.studentForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var students = getStudents();
+        var editId = els.stuEditId.value.trim();
+        var statusVal = els.stuStatus.value;
+        var struckDateVal = statusVal === 'Inactive' ? (els.stuStruckOffDate.value || formatDateISO(new Date())) : '';
+
+        if (editId) {
+          students = students.map(function (s) {
+            if (s.id !== editId) return s;
+            return Object.assign({}, s, {
+              name: els.stuFullName.value.trim(),
+              fatherName: els.stuFatherName.value.trim(),
+              phone: els.stuPhone.value.trim(),
+              batch: els.stuBatch.value.trim(),
+              enrollmentDate: els.stuEnrollDate.value,
+              struckOffDate: struckDateVal,
+              status: statusVal,
+              monthlyFee: Math.max(0, Number(els.stuMonthlyFee.value) || 15000)
+            });
+          });
+          safeSet(STORAGE_KEYS.STUDENTS, students);
+          showToast('Updated student record in localStorage.');
+        } else {
+          var newStu = {
+            id: 'stu_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            rollNo: generateNextRollNo(students),
+            name: els.stuFullName.value.trim(),
+            fatherName: els.stuFatherName.value.trim(),
+            phone: els.stuPhone.value.trim(),
+            batch: els.stuBatch.value.trim(),
+            enrollmentDate: els.stuEnrollDate.value,
+            struckOffDate: struckDateVal,
+            status: statusVal,
+            monthlyFee: Math.max(0, Number(els.stuMonthlyFee.value) || 15000)
+          };
+          students.unshift(newStu);
+          safeSet(STORAGE_KEYS.STUDENTS, students);
+          showToast('Enrolled ' + newStu.name + ' (' + newStu.rollNo + ').');
+        }
+
+        closeStudentModal();
+        renderAll();
+      });
+
+      // View Student Modal
+      els.closeViewStudentBtn.addEventListener('click', function () { els.viewStudentModal.classList.add('hidden'); });
+      els.closeViewStudentFooterBtn.addEventListener('click', function () { els.viewStudentModal.classList.add('hidden'); });
+      els.viewEditTriggerBtn.addEventListener('click', function () {
+        var targetId = viewingStudentId;
+        els.viewStudentModal.classList.add('hidden');
+        if (targetId) openStudentModal(targetId);
+      });
+
+      // Generate Monthly Invoices
+      els.topGenerateInvoicesBtn.addEventListener('click', openGenerateInvoicesModal);
+      els.openGenerateModalBtn.addEventListener('click', openGenerateInvoicesModal);
+      els.closeGenerateModalBtn.addEventListener('click', function () { els.generateModal.classList.add('hidden'); });
+      els.cancelGenerateModalBtn.addEventListener('click', function () { els.generateModal.classList.add('hidden'); });
+      els.genMonthInput.addEventListener('change', updateGenerateModalPreview);
+
+      els.generateInvoicesForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var monthKey = els.genMonthInput.value;
+        var issueDate = els.genIssueDateInput.value || formatDateISO(new Date());
+        var dueDate = els.genDueDateInput.value || (monthKey + '-10');
+        var defaultAmt = Math.max(1, Number(els.genAmountInput.value) || 15000);
+
+        var activeStudents = getStudents().filter(function (s) { return s.status === 'Active'; });
+        if (activeStudents.length === 0) {
+          showToast('No Active students available to invoice.', true);
+          return;
+        }
+
+        var invoices = getInvoices();
+        var createdCount = 0;
+        var skippedCount = 0;
+        var existingCountForMonth = invoices.filter(function (inv) { return inv.month === monthKey; }).length;
+
+        activeStudents.forEach(function (stu) {
+          var duplicate = invoices.some(function (inv) {
+            return inv.studentId === stu.id && inv.month === monthKey;
+          });
+          if (duplicate) {
+            skippedCount++;
+            return;
+          }
+          existingCountForMonth++;
+          var invId = 'INV-' + monthKey.replace('-', '') + '-' + String(existingCountForMonth).padStart(3, '0') + '-' + Math.random().toString(36).slice(2, 4).toUpperCase();
+          invoices.unshift({
+            invoiceId: invId,
+            studentId: stu.id,
+            month: monthKey,
+            amount: Number(stu.monthlyFee) > 0 ? Number(stu.monthlyFee) : defaultAmt,
+            status: 'Unpaid',
+            issueDate: issueDate,
+            dueDate: dueDate,
+            paidDate: ''
+          });
+          createdCount++;
+        });
+
+        safeSet(STORAGE_KEYS.INVOICES, invoices);
+        els.generateModal.classList.add('hidden');
+        switchTab('fees');
+        showToast(
+          createdCount > 0
+            ? 'Generated ' + createdCount + ' invoice(s) for ' + formatMonthLabel(monthKey) + (skippedCount ? ' (' + skippedCount + ' duplicates skipped).' : '.')
+            : 'All Active students already have invoices for ' + formatMonthLabel(monthKey) + '.',
+          createdCount === 0
+        );
+      });
+
+      // Filters & Search
+      els.studentSearchInput.addEventListener('input', renderStudentsTab);
+      els.studentStatusFilter.addEventListener('change', renderStudentsTab);
+
+      els.feePeriodSelect.addEventListener('change', function () {
+        els.feeCustomDateWrap.classList.toggle('hidden', els.feePeriodSelect.value !== 'custom');
+        renderFeesTab();
+      });
+      els.feeCustomStart.addEventListener('change', renderFeesTab);
+      els.feeCustomEnd.addEventListener('change', renderFeesTab);
+      els.feeSearchInput.addEventListener('input', renderFeesTab);
+
+      Array.prototype.forEach.call(document.querySelectorAll('[data-fee-status]'), function (btn) {
+        btn.addEventListener('click', function () {
+          activeFeeStatusFilter = btn.getAttribute('data-fee-status') || 'All';
+          Array.prototype.forEach.call(document.querySelectorAll('[data-fee-status]'), function (b) {
+            b.classList.remove('active', 'active-due');
+          });
+          btn.classList.add(activeFeeStatusFilter === 'Unpaid' ? 'active-due' : 'active');
+          renderFeesTab();
+        });
+      });
+
+      // Printable Slip
+      els.closePrintModalBtn.addEventListener('click', function () { els.printSlipModal.classList.add('hidden'); });
+      els.closePrintFooterBtn.addEventListener('click', function () { els.printSlipModal.classList.add('hidden'); });
+      els.triggerPrintBtn.addEventListener('click', function () { window.print(); });
+
+      // Reports Date Range
+      Array.prototype.forEach.call(document.querySelectorAll('[data-range-preset]'), function (btn) {
+        btn.addEventListener('click', function () {
+          setReportPresetMonths(Number(btn.getAttribute('data-range-preset')) || 1);
+        });
+      });
+      els.reportStartDate.addEventListener('change', renderReportsTab);
+      els.reportEndDate.addEventListener('change', renderReportsTab);
+
+      els.exportReportCsvBtn.addEventListener('click', function () {
+        var studentMap = {};
+        getStudents().forEach(function (s) { studentMap[s.id] = s; });
+        var rows = getReportRangeInvoices();
+        var header = ['Invoice ID', 'Student Name', 'Roll No', 'Month', 'Issue Date', 'Amount', 'Status'];
+        var lines = rows.map(function (inv) {
+          var stu = studentMap[inv.studentId];
+          return [inv.invoiceId, stu ? stu.name : 'Archived', stu ? stu.rollNo : '', inv.month, inv.issueDate, inv.amount, inv.status]
+            .map(function (v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; })
+            .join(',');
+        });
+        var blob = new Blob([header.join(',') + '\n' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'fee-report-' + formatDateISO(new Date()) + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Exported ' + rows.length + ' invoice record(s) to CSV.');
+      });
+
+      // Reset Demo DB (inline two-click confirm without browser alert/confirm)
+      var resetArmed = false;
+      var resetTimer = null;
+      els.resetSampleDbBtn.addEventListener('click', function () {
+        if (!resetArmed) {
+          resetArmed = true;
+          els.resetSampleDbBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Click Again to Reset</span>';
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(function () {
+            resetArmed = false;
+            els.resetSampleDbBtn.innerHTML = '<i class="fa-solid fa-rotate"></i><span>Reset Demo Database</span>';
+          }, 3200);
+          return;
+        }
+        resetArmed = false;
+        clearTimeout(resetTimer);
+        els.resetSampleDbBtn.innerHTML = '<i class="fa-solid fa-rotate"></i><span>Reset Demo Database</span>';
+        localStorage.removeItem(STORAGE_KEYS.STUDENTS);
+        localStorage.removeItem(STORAGE_KEYS.INVOICES);
+        seedDatabaseIfEmpty();
+        renderAll();
+        showToast('Demo students & fee invoices restored.');
+      });
+
+      // Cross-tab sync
+      window.addEventListener('storage', function (e) {
+        if (e.key === STORAGE_KEYS.STUDENTS || e.key === STORAGE_KEYS.INVOICES) {
+          renderAll();
+        }
+      });
+
+      // Initialize default 1-month report range & render UI
+      setReportPresetMonths(1);
+      renderAll();
+    })();
+  </script>
+</body>
+</html>

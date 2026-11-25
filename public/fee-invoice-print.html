@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OK Korean LMS — Fee Invoice Management &amp; Print System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      --bg-root: #09090b;
+      --bg-card: #18181b;
+      --bg-elevated: #121216;
+      --bg-hover: #202026;
+      --border-subtle: #27272a;
+      --border-strong: #3f3f46;
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.14);
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.14);
+      --yellow: #f59e0b;
+      --yellow-soft: rgba(245, 158, 11, 0.14);
+      --indigo: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--bg-root);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+    /* Shell */
+    .dashboard-shell {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 14% 0%, rgba(16, 185, 129, 0.06), transparent 34%),
+        radial-gradient(circle at 86% 4%, rgba(245, 158, 11, 0.04), transparent 30%),
+        var(--bg-root);
+      padding-bottom: 40px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(9, 9, 11, 0.86);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 24px;
+    }
+
+    .topbar-inner {
+      max-width: 1420px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.2);
+      flex-shrink: 0;
+    }
+
+    .brand-title h1 {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-title p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .container {
+      max-width: 1420px;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: #27272a;
+      border-color: var(--border-strong);
+    }
+
+    .btn-sm {
+      padding: 6px 11px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    .btn-green {
+      background: var(--green);
+      border-color: var(--green);
+      color: #052e16;
+      font-weight: 700;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.22);
+    }
+
+    .btn-green:hover {
+      background: #059669;
+      border-color: #059669;
+      color: #ffffff;
+    }
+
+    .btn-red {
+      background: var(--red-soft);
+      border-color: rgba(239, 68, 68, 0.42);
+      color: #fca5a5;
+    }
+
+    .btn-red:hover {
+      background: var(--red);
+      border-color: var(--red);
+      color: #ffffff;
+    }
+
+    .control-input, .control-select {
+      background: #101014;
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.15s ease;
+    }
+
+    .control-input:focus, .control-select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+    }
+
+    /* KPI Strip */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 18px 20px;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+    }
+
+    .stat-card.stat-green { border-color: rgba(16, 185, 129, 0.35); }
+    .stat-card.stat-red { border-color: rgba(239, 68, 68, 0.35); }
+    .stat-card.stat-yellow { border-color: rgba(245, 158, 11, 0.35); }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .stat-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .ic-green { background: var(--green-soft); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.35); }
+    .ic-red { background: var(--red-soft); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.35); }
+    .ic-yellow { background: var(--yellow-soft); color: var(--yellow); border: 1px solid rgba(245, 158, 11, 0.35); }
+    .ic-indigo { background: rgba(99, 102, 241, 0.14); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.35); }
+
+    .stat-val {
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Main Table Panel */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .filter-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 13px;
+      border-radius: 9px;
+      border: 1px solid var(--border-subtle);
+      background: #09090b;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .filter-tab-btn:hover {
+      color: #ffffff;
+      border-color: var(--border-strong);
+    }
+
+    .filter-tab-btn.active-all {
+      background: rgba(99, 102, 241, 0.18);
+      border-color: rgba(99, 102, 241, 0.55);
+      color: #c7d2fe;
+    }
+
+    .filter-tab-btn.active-paid {
+      background: var(--green-soft);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: var(--green);
+    }
+
+    .filter-tab-btn.active-pending {
+      background: var(--red-soft);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
+    .filter-tab-btn.active-partial {
+      background: var(--yellow-soft);
+      border-color: rgba(245, 158, 11, 0.5);
+      color: #fcd34d;
+    }
+
+    .tab-badge {
+      padding: 1px 7px;
+      border-radius: 9999px;
+      font-size: 11px;
+      background: #18181b;
+      color: inherit;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 250px;
+      flex: 1;
+      max-width: 360px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .search-box input {
+      padding-left: 36px;
+    }
+
+    /* Responsive Table */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+    }
+
+    table.inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 920px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    table.inv-table thead {
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    table.inv-table th {
+      padding: 13px 15px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    table.inv-table td {
+      padding: 14px 15px;
+      border-bottom: 1px solid #222229;
+      vertical-align: middle;
+    }
+
+    table.inv-table tbody tr {
+      transition: background-color 0.14s ease;
+    }
+
+    table.inv-table tbody tr:hover {
+      background: var(--bg-hover);
+    }
+
+    table.inv-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .inv-id-chip {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 7px;
+      background: #101014;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-paid {
+      background: var(--green-soft);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.38);
+    }
+
+    .badge-pending {
+      background: var(--red-soft);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.42);
+    }
+
+    .badge-partial {
+      background: var(--yellow-soft);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.42);
+    }
+
+    .empty-row {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 780px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.72);
+      animation: popIn 0.18s ease;
+    }
+
+    .modal-card.size-a5 {
+      max-width: 600px;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-head {
+      padding: 16px 22px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .modal-head h3 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .modal-body {
+      padding: 20px 22px;
+      max-height: 76vh;
+      overflow-y: auto;
+      background: #0f0f13;
+    }
+
+    .modal-foot {
+      padding: 15px 22px;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* CLEAN WHITE PRINTABLE INVOICE DESIGN */
+    .invoice-paper {
+      background: #ffffff;
+      color: #09090b;
+      border-radius: 10px;
+      padding: 28px 30px;
+      border: 1px solid #d4d4d8;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .paper-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #09090b;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .paper-brand h2 {
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #09090b;
+    }
+
+    .paper-brand p {
+      font-size: 11.5px;
+      color: #52525b;
+      margin-top: 3px;
+      line-height: 1.45;
+    }
+
+    .paper-inv-meta {
+      text-align: right;
+    }
+
+    .paper-inv-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #52525b;
+    }
+
+    .paper-inv-id {
+      font-size: 18px;
+      font-weight: 900;
+      color: #09090b;
+      margin-top: 2px;
+    }
+
+    .paper-student-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+      font-size: 12.5px;
+    }
+
+    .paper-cell {
+      padding: 10px 12px;
+      border: 1px solid #e4e4e7;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .paper-cell span {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #71717a;
+      margin-bottom: 2px;
+    }
+
+    .paper-cell strong {
+      color: #09090b;
+      font-size: 13px;
+    }
+
+    table.paper-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+      font-size: 12.5px;
+    }
+
+    table.paper-table th {
+      background: #f4f4f5;
+      color: #18181b;
+      text-align: left;
+      padding: 10px 12px;
+      border: 1px solid #d4d4d8;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    table.paper-table td {
+      padding: 11px 12px;
+      border: 1px solid #d4d4d8;
+      color: #09090b;
+    }
+
+    .paper-summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid #d4d4d8;
+      border-radius: 10px;
+      background: #fafafa;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .stamp-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 18px;
+      border: 3px solid currentColor;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transform: rotate(-5deg);
+    }
+
+    .stamp-paid { color: #059669; }
+    .stamp-pending { color: #dc2626; }
+    .stamp-partial { color: #d97706; }
+
+    .paper-footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 16px;
+      border-top: 1px dashed #a1a1aa;
+      font-size: 12px;
+      color: #3f3f46;
+      flex-wrap: wrap;
+    }
+
+    .sig-line {
+      min-width: 190px;
+      text-align: center;
+    }
+
+    .sig-line div {
+      border-bottom: 1.5px solid #09090b;
+      height: 28px;
+      margin-bottom: 5px;
+    }
+
+    .toast-stack {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: #18181b;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #ffffff;
+      padding: 11px 16px;
+      border-radius: 11px;
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.72);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1020px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 16px; }
+      .topbar { padding: 14px 16px; }
+      .stats-grid, .form-grid, .paper-student-grid {
+        grid-template-columns: 1fr;
+      }
+      .paper-inv-meta {
+        text-align: left;
+      }
+      .invoice-paper {
+        padding: 18px;
+      }
+    }
+
+    /* =====================================================================
+       @MEDIA PRINT — HIDES ENTIRE DASHBOARD, PRINTS ONLY WHITE INVOICE PAPER
+       SUPPORTS BOTH A4 AND A5 PAPER SIZES
+    ====================================================================== */
+    @media print {
+      @page {
+        margin: 12mm;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        width: 100% !important;
+        height: auto !important;
+      }
+      .dashboard-shell,
+      .toast-stack,
+      #createInvoiceModal,
+      #paymentModal,
+      .no-print {
+        display: none !important;
+      }
+      #printInvoiceModal {
+        position: static !important;
+        inset: auto !important;
+        display: block !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+      #printInvoiceModal .modal-card {
+        border: none !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+      }
+      #printInvoiceModal .modal-head,
+      #printInvoiceModal .modal-foot {
+        display: none !important;
+      }
+      #printInvoiceModal .modal-body {
+        padding: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+      }
+      #printableInvoice {
+        box-shadow: none !important;
+        border: 1.5px solid #09090b !important;
+        background: #ffffff !important;
+        color: #09090b !important;
+        width: 100% !important;
+        padding: 20px !important;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-shell">
+    <!-- Top Header -->
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand-wrap">
+          <div class="brand-badge">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </div>
+          <div class="brand-title">
+            <h1>Fee Invoice Management &amp; Print System</h1>
+            <p>OK Korean LMS &middot; Dark Admin Dashboard &amp; Clean White A4/A5 Invoice Printing</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="openAddInvoiceBtn" class="btn btn-green" type="button">
+            <i class="fa-solid fa-plus"></i>
+            <span>New Invoice</span>
+          </button>
+          <button id="resetDbBtn" class="btn btn-red" type="button">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Reset Sample Data</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- KPI Summary Cards -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Total Billed</span>
+            <div class="stat-icon ic-indigo"><i class="fa-solid fa-receipt"></i></div>
+          </div>
+          <div id="kpiTotalBilled" class="stat-val font-mono">Rs. 0</div>
+          <div id="kpiTotalCount" class="stat-sub">0 invoices in system</div>
+        </div>
+
+        <div class="stat-card stat-green">
+          <div class="stat-top">
+            <span class="stat-label">Total Collected (Paid)</span>
+            <div class="stat-icon ic-green"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+          <div id="kpiTotalPaid" class="stat-val font-mono" style="color:var(--green);">Rs. 0</div>
+          <div id="kpiPaidCount" class="stat-sub">0 fully paid invoices</div>
+        </div>
+
+        <div class="stat-card stat-yellow">
+          <div class="stat-top">
+            <span class="stat-label">Partial Payments</span>
+            <div class="stat-icon ic-yellow"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          </div>
+          <div id="kpiPartialCount" class="stat-val font-mono" style="color:var(--yellow);">0</div>
+          <div class="stat-sub">Invoices with partial balance paid</div>
+        </div>
+
+        <div class="stat-card stat-red">
+          <div class="stat-top">
+            <span class="stat-label">Remaining Balance Due</span>
+            <div class="stat-icon ic-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          </div>
+          <div id="kpiRemaining" class="stat-val font-mono" style="color:var(--red);">Rs. 0</div>
+          <div id="kpiPendingCount" class="stat-sub">0 pending / partial dues</div>
+        </div>
+      </section>
+
+      <!-- Invoice Table Panel -->
+      <section class="panel-card">
+        <!-- Filters & Search Toolbar -->
+        <div class="toolbar">
+          <div class="filter-tabs" role="tablist" aria-label="Invoice Status Filter">
+            <button class="filter-tab-btn active-all" data-filter="All" type="button">
+              <span>All</span>
+              <span id="cntAll" class="tab-badge font-mono">0</span>
+            </button>
+            <button class="filter-tab-btn" data-filter="Paid" type="button">
+              <i class="fa-solid fa-circle-check" style="color:var(--green);"></i>
+              <span>Paid</span>
+              <span id="cntPaid" class="tab-badge font-mono">0</span>
+            </button>
+            <button class="filter-tab-btn" data-filter="Pending" type="button">
+              <i class="fa-solid fa-circle-exclamation" style="color:var(--red);"></i>
+              <span>Pending</span>
+              <span id="cntPending" class="tab-badge font-mono">0</span>
+            </button>
+            <button class="filter-tab-btn" data-filter="Partial" type="button">
+              <i class="fa-solid fa-circle-half-stroke" style="color:var(--yellow);"></i>
+              <span>Partial</span>
+              <span id="cntPartial" class="tab-badge font-mono">0</span>
+            </button>
+          </div>
+
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="searchInput" type="text" class="control-input" placeholder="Search by Student Name or Invoice ID..." />
+          </div>
+        </div>
+
+        <!-- Scrollable Responsive Table -->
+        <div class="table-responsive">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Invoice ID</th>
+                <th>Student Name</th>
+                <th>Batch</th>
+                <th>Month</th>
+                <th>Total Amount</th>
+                <th>Paid Amount</th>
+                <th>Remaining</th>
+                <th>Status</th>
+                <th style="text-align:right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===================== PRINT INVOICE MODAL ===================== -->
+  <div id="printInvoiceModal" class="modal-backdrop hidden">
+    <div id="printModalCard" class="modal-card">
+      <div class="modal-head no-print">
+        <div>
+          <h3>Print Invoice Preview</h3>
+          <span style="font-size:11.5px; color:var(--text-secondary);">Clean white printer-friendly receipt</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <select id="paperSizeSelect" class="control-select" style="width:130px; padding:6px 10px; font-size:12px;" aria-label="Paper Size">
+            <option value="A4">Paper: A4</option>
+            <option value="A5">Paper: A5</option>
+          </select>
+          <button id="closePrintModalBtn" class="btn btn-sm" type="button" aria-label="Close modal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div id="printableInvoice" class="invoice-paper"></div>
+      </div>
+
+      <div class="modal-foot no-print">
+        <span style="font-size:12px; color:var(--text-secondary);">
+          <i class="fa-solid fa-circle-info" style="color:var(--green); margin-right:5px;"></i>
+          Only the white invoice above will print when clicking <strong>Print Now</strong>.
+        </span>
+        <div style="display:flex; gap:10px;">
+          <button id="closePrintFooterBtn" class="btn" type="button">Close</button>
+          <button id="printNowBtn" class="btn btn-green" type="button">
+            <i class="fa-solid fa-print"></i>
+            <span>Print Now</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ADD INVOICE MODAL ===================== -->
+  <div id="createInvoiceModal" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width:560px;">
+      <div class="modal-head">
+        <h3>Create Fee Invoice</h3>
+        <button id="closeCreateModalBtn" class="btn btn-sm" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="createInvoiceForm">
+        <div class="modal-body" style="background:var(--bg-card);">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="newStudentName">Student Name *</label>
+              <input id="newStudentName" type="text" class="control-input" placeholder="e.g., Ali Hassan" required />
+            </div>
+
+            <div class="form-field">
+              <label for="newRollNo">Roll No *</label>
+              <input id="newRollNo" type="text" class="control-input font-mono" placeholder="e.g., OK-2026-006" required />
+            </div>
+
+            <div class="form-field">
+              <label for="newBatch">Batch *</label>
+              <input id="newBatch" type="text" class="control-input" placeholder="e.g., Morning Batch (TOPIK I)" required />
+            </div>
+
+            <div class="form-field">
+              <label for="newMonth">Month *</label>
+              <input id="newMonth" type="text" class="control-input" value="November 2026" required />
+            </div>
+
+            <div class="form-field">
+              <label for="newTotalAmount">Total Amount (PKR) *</label>
+              <input id="newTotalAmount" type="number" min="1" class="control-input font-mono" value="5000" required />
+            </div>
+
+            <div class="form-field">
+              <label for="newPaidAmount">Paid Amount (PKR) *</label>
+              <input id="newPaidAmount" type="number" min="0" class="control-input font-mono" value="0" required />
+            </div>
+
+            <div class="form-field">
+              <label for="newDueDate">Due Date *</label>
+              <input id="newDueDate" type="date" class="control-input font-mono" required />
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button id="cancelCreateModalBtn" class="btn" type="button">Cancel</button>
+          <button type="submit" class="btn btn-green">
+            <i class="fa-solid fa-check"></i>
+            <span>Save Invoice</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== UPDATE PAYMENT MODAL ===================== -->
+  <div id="paymentModal" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width:440px;">
+      <div class="modal-head">
+        <h3>Record Fee Payment</h3>
+        <button id="closePayModalBtn" class="btn btn-sm" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="paymentForm">
+        <div class="modal-body" style="background:var(--bg-card); display:flex; flex-direction:column; gap:14px;">
+          <input type="hidden" id="payInvoiceId" />
+          <div id="payInvoiceSummary" style="font-size:13px; color:var(--text-secondary);"></div>
+          <div class="form-field">
+            <label for="payAmountInput">Paid Amount (PKR) *</label>
+            <input id="payAmountInput" type="number" min="0" class="control-input font-mono" required />
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button id="cancelPayModalBtn" class="btn" type="button">Cancel</button>
+          <button type="submit" class="btn btn-green">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Update Payment</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastStack" class="toast-stack" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var STORAGE_KEY = 'lms_fee_invoices_print_v1';
+
+      var INITIAL_SAMPLE_INVOICES = [
+        {
+          id: 'INV-001',
+          studentName: 'Muhammad Ahmad',
+          rollNo: 'OK-2026-001',
+          batch: 'Morning Batch (TOPIK I)',
+          month: 'November 2026',
+          totalAmount: 5000,
+          paidAmount: 5000,
+          status: 'Paid',
+          dueDate: '2026-11-10'
+        },
+        {
+          id: 'INV-002',
+          studentName: 'Abdul Rehman',
+          rollNo: 'OK-2026-002',
+          batch: 'Morning Batch (TOPIK I)',
+          month: 'November 2026',
+          totalAmount: 5000,
+          paidAmount: 3000,
+          status: 'Partial',
+          dueDate: '2026-11-10'
+        },
+        {
+          id: 'INV-003',
+          studentName: 'Abdul-Rafay',
+          rollNo: 'OK-2026-003',
+          batch: 'Evening Batch (EPS Prep)',
+          month: 'November 2026',
+          totalAmount: 5000,
+          paidAmount: 0,
+          status: 'Pending',
+          dueDate: '2026-11-10'
+        },
+        {
+          id: 'INV-004',
+          studentName: 'Ayesha Siddiqa',
+          rollNo: 'OK-2026-004',
+          batch: 'Evening Batch (TOPIK II)',
+          month: 'November 2026',
+          totalAmount: 6500,
+          paidAmount: 6500,
+          status: 'Paid',
+          dueDate: '2026-11-12'
+        },
+        {
+          id: 'INV-005',
+          studentName: 'Hamza Tariq',
+          rollNo: 'OK-2026-005',
+          batch: 'Morning Batch (TOPIK I)',
+          month: 'November 2026',
+          totalAmount: 5000,
+          paidAmount: 2000,
+          status: 'Partial',
+          dueDate: '2026-11-15'
+        }
+      ];
+
+      function safeReadInvoices() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_SAMPLE_INVOICES));
+            return INITIAL_SAMPLE_INVOICES.slice();
+          }
+          var parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : INITIAL_SAMPLE_INVOICES.slice();
+        } catch (err) {
+          return INITIAL_SAMPLE_INVOICES.slice();
+        }
+      }
+
+      function safeSaveInvoices(list) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        } catch (err) {
+          console.warn('localStorage save warning:', err);
+        }
+      }
+
+      function deriveStatus(total, paid) {
+        if (paid >= total && total > 0) return 'Paid';
+        if (paid > 0 && paid < total) return 'Partial';
+        return 'Pending';
+      }
+
+      function formatCurrency(val) {
+        return 'Rs. ' + Number(val || 0).toLocaleString('en-US');
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      // =========================================================================
+      // STATE & ELEMENTS
+      // =========================================================================
+      var activeFilter = 'All';
+
+      var els = {
+        kpiTotalBilled: document.getElementById('kpiTotalBilled'),
+        kpiTotalCount: document.getElementById('kpiTotalCount'),
+        kpiTotalPaid: document.getElementById('kpiTotalPaid'),
+        kpiPaidCount: document.getElementById('kpiPaidCount'),
+        kpiPartialCount: document.getElementById('kpiPartialCount'),
+        kpiRemaining: document.getElementById('kpiRemaining'),
+        kpiPendingCount: document.getElementById('kpiPendingCount'),
+
+        cntAll: document.getElementById('cntAll'),
+        cntPaid: document.getElementById('cntPaid'),
+        cntPending: document.getElementById('cntPending'),
+        cntPartial: document.getElementById('cntPartial'),
+
+        searchInput: document.getElementById('searchInput'),
+        invoiceTableBody: document.getElementById('invoiceTableBody'),
+
+        printInvoiceModal: document.getElementById('printInvoiceModal'),
+        printModalCard: document.getElementById('printModalCard'),
+        paperSizeSelect: document.getElementById('paperSizeSelect'),
+        printableInvoice: document.getElementById('printableInvoice'),
+        closePrintModalBtn: document.getElementById('closePrintModalBtn'),
+        closePrintFooterBtn: document.getElementById('closePrintFooterBtn'),
+        printNowBtn: document.getElementById('printNowBtn'),
+
+        openAddInvoiceBtn: document.getElementById('openAddInvoiceBtn'),
+        createInvoiceModal: document.getElementById('createInvoiceModal'),
+        createInvoiceForm: document.getElementById('createInvoiceForm'),
+        closeCreateModalBtn: document.getElementById('closeCreateModalBtn'),
+        cancelCreateModalBtn: document.getElementById('cancelCreateModalBtn'),
+        newStudentName: document.getElementById('newStudentName'),
+        newRollNo: document.getElementById('newRollNo'),
+        newBatch: document.getElementById('newBatch'),
+        newMonth: document.getElementById('newMonth'),
+        newTotalAmount: document.getElementById('newTotalAmount'),
+        newPaidAmount: document.getElementById('newPaidAmount'),
+        newDueDate: document.getElementById('newDueDate'),
+
+        paymentModal: document.getElementById('paymentModal'),
+        paymentForm: document.getElementById('paymentForm'),
+        payInvoiceId: document.getElementById('payInvoiceId'),
+        payInvoiceSummary: document.getElementById('payInvoiceSummary'),
+        payAmountInput: document.getElementById('payAmountInput'),
+        closePayModalBtn: document.getElementById('closePayModalBtn'),
+        cancelPayModalBtn: document.getElementById('cancelPayModalBtn'),
+
+        resetDbBtn: document.getElementById('resetDbBtn'),
+        toastStack: document.getElementById('toastStack')
+      };
+
+      function showToast(message) {
+        var toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML =
+          '<i class="fa-solid fa-circle-check" style="color:var(--green);"></i>' +
+          '<span>' + escapeHtml(message) + '</span>';
+        els.toastStack.appendChild(toast);
+        setTimeout(function () {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 3000);
+      }
+
+      // =========================================================================
+      // DASHBOARD RENDERING
+      // =========================================================================
+      function renderStatusBadge(status) {
+        if (status === 'Paid') {
+          return '<span class="status-badge badge-paid"><i class="fa-solid fa-circle-check"></i> Paid</span>';
+        }
+        if (status === 'Partial') {
+          return '<span class="status-badge badge-partial"><i class="fa-solid fa-circle-half-stroke"></i> Partial</span>';
+        }
+        return '<span class="status-badge badge-pending"><i class="fa-solid fa-circle-exclamation"></i> Pending</span>';
+      }
+
+      function renderDashboard() {
+        var invoices = safeReadInvoices();
+
+        var totalBilled = 0;
+        var totalPaid = 0;
+        var totalRemaining = 0;
+        var paidCount = 0;
+        var pendingCount = 0;
+        var partialCount = 0;
+
+        invoices.forEach(function (inv) {
+          var t = Number(inv.totalAmount || 0);
+          var p = Number(inv.paidAmount || 0);
+          var r = Math.max(0, t - p);
+          totalBilled += t;
+          totalPaid += p;
+          totalRemaining += r;
+          if (inv.status === 'Paid') paidCount++;
+          else if (inv.status === 'Partial') partialCount++;
+          else pendingCount++;
+        });
+
+        els.kpiTotalBilled.textContent = formatCurrency(totalBilled);
+        els.kpiTotalCount.textContent = invoices.length + ' invoice(s) recorded';
+        els.kpiTotalPaid.textContent = formatCurrency(totalPaid);
+        els.kpiPaidCount.textContent = paidCount + ' fully paid invoice(s)';
+        els.kpiPartialCount.textContent = String(partialCount);
+        els.kpiRemaining.textContent = formatCurrency(totalRemaining);
+        els.kpiPendingCount.textContent = (pendingCount + partialCount) + ' unpaid / partial invoice(s)';
+
+        els.cntAll.textContent = String(invoices.length);
+        els.cntPaid.textContent = String(paidCount);
+        els.cntPending.textContent = String(pendingCount);
+        els.cntPartial.textContent = String(partialCount);
+
+        var q = els.searchInput.value.trim().toLowerCase();
+        var filtered = invoices.filter(function (inv) {
+          if (activeFilter !== 'All' && inv.status !== activeFilter) return false;
+          if (!q) return true;
+          return (
+            String(inv.id || '').toLowerCase().indexOf(q) !== -1 ||
+            String(inv.studentName || '').toLowerCase().indexOf(q) !== -1 ||
+            String(inv.rollNo || '').toLowerCase().indexOf(q) !== -1 ||
+            String(inv.batch || '').toLowerCase().indexOf(q) !== -1
+          );
+        });
+
+        if (filtered.length === 0) {
+          els.invoiceTableBody.innerHTML =
+            '<tr><td colspan="9" class="empty-row"><i class="fa-regular fa-folder-open" style="font-size:22px; display:block; margin-bottom:8px;"></i>No fee invoices match your filter or search query.</td></tr>';
+          return;
+        }
+
+        els.invoiceTableBody.innerHTML = filtered
+          .map(function (inv) {
+            var remaining = Math.max(0, Number(inv.totalAmount || 0) - Number(inv.paidAmount || 0));
+            return (
+              '<tr>' +
+                '<td><span class="inv-id-chip font-mono">' + escapeHtml(inv.id) + '</span></td>' +
+                '<td>' +
+                  '<div style="font-weight:700; color:#ffffff;">' + escapeHtml(inv.studentName) + '</div>' +
+                  '<div class="font-mono" style="font-size:11px; color:var(--text-muted); margin-top:2px;">Roll: ' + escapeHtml(inv.rollNo) + ' &middot; Due: ' + escapeHtml(inv.dueDate) + '</div>' +
+                '</td>' +
+                '<td style="color:var(--text-secondary);">' + escapeHtml(inv.batch) + '</td>' +
+                '<td style="font-weight:600;">' + escapeHtml(inv.month) + '</td>' +
+                '<td class="font-mono" style="font-weight:700;">' + formatCurrency(inv.totalAmount) + '</td>' +
+                '<td class="font-mono" style="font-weight:700; color:var(--green);">' + formatCurrency(inv.paidAmount) + '</td>' +
+                '<td class="font-mono" style="font-weight:700; color:' + (remaining > 0 ? 'var(--red)' : 'var(--text-muted)') + ';">' + formatCurrency(remaining) + '</td>' +
+                '<td>' + renderStatusBadge(inv.status) + '</td>' +
+                '<td style="text-align:right; white-space:nowrap;">' +
+                  '<button class="btn btn-sm" data-pay-id="' + escapeHtml(inv.id) + '" type="button" style="margin-right:6px;" title="Update Paid Amount">' +
+                    '<i class="fa-solid fa-money-bill-wave" style="color:var(--green);"></i>' +
+                    '<span>Pay</span>' +
+                  '</button>' +
+                  '<button class="btn btn-sm btn-green" data-print-id="' + escapeHtml(inv.id) + '" type="button">' +
+                    '<i class="fa-solid fa-print"></i>' +
+                    '<span>Print</span>' +
+                  '</button>' +
+                '</td>' +
+              '</tr>'
+            );
+          })
+          .join('');
+
+        Array.prototype.forEach.call(els.invoiceTableBody.querySelectorAll('[data-print-id]'), function (btn) {
+          btn.addEventListener('click', function () {
+            openPrintModal(btn.getAttribute('data-print-id'));
+          });
+        });
+
+        Array.prototype.forEach.call(els.invoiceTableBody.querySelectorAll('[data-pay-id]'), function (btn) {
+          btn.addEventListener('click', function () {
+            openPaymentModal(btn.getAttribute('data-pay-id'));
+          });
+        });
+      }
+
+      // =========================================================================
+      // PRINTABLE INVOICE MODAL (CLEAN WHITE DESIGN)
+      // =========================================================================
+      function openPrintModal(invoiceId) {
+        var inv = safeReadInvoices().find(function (i) { return i.id === invoiceId; });
+        if (!inv) return;
+
+        var totalAmt = Number(inv.totalAmount || 0);
+        var paidAmt = Number(inv.paidAmount || 0);
+        var remaining = Math.max(0, totalAmt - paidAmt);
+        var todayStr = new Date().toISOString().split('T')[0];
+
+        var stampClass =
+          inv.status === 'Paid' ? 'stamp-paid' : inv.status === 'Partial' ? 'stamp-partial' : 'stamp-pending';
+        var stampText = inv.status.toUpperCase();
+
+        els.printableInvoice.innerHTML =
+          '<div class="paper-header">' +
+            '<div class="paper-brand">' +
+              '<h2>OK Korean Language LMS</h2>' +
+              '<p>Gulberg III Academic Campus, Lahore, Pakistan<br />Contact: +92 300 1234567 &middot; accounts@okkoreanlms.edu</p>' +
+            '</div>' +
+            '<div class="paper-inv-meta">' +
+              '<div class="paper-inv-label">Official Tuition Invoice</div>' +
+              '<div class="paper-inv-id font-mono">' + escapeHtml(inv.id) + '</div>' +
+              '<div class="font-mono" style="font-size:11px; color:#52525b; margin-top:2px;">Issue Date: ' + escapeHtml(todayStr) + '</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="paper-student-grid">' +
+            '<div class="paper-cell"><span>Student Name</span><strong>' + escapeHtml(inv.studentName) + '</strong></div>' +
+            '<div class="paper-cell"><span>Roll Number</span><strong class="font-mono">' + escapeHtml(inv.rollNo) + '</strong></div>' +
+            '<div class="paper-cell"><span>Assigned Batch</span><strong>' + escapeHtml(inv.batch) + '</strong></div>' +
+            '<div class="paper-cell"><span>Due Date</span><strong class="font-mono">' + escapeHtml(inv.dueDate) + '</strong></div>' +
+          '</div>' +
+
+          '<table class="paper-table">' +
+            '<thead>' +
+              '<tr>' +
+                '<th>Description</th>' +
+                '<th style="text-align:right;">Total Amount</th>' +
+                '<th style="text-align:right;">Paid Amount</th>' +
+                '<th style="text-align:right;">Remaining Balance</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody>' +
+              '<tr>' +
+                '<td><strong>Monthly Fee for ' + escapeHtml(inv.month) + '</strong></td>' +
+                '<td class="font-mono" style="text-align:right; font-weight:700;">' + formatCurrency(totalAmt) + '</td>' +
+                '<td class="font-mono" style="text-align:right; font-weight:700; color:#059669;">' + formatCurrency(paidAmt) + '</td>' +
+                '<td class="font-mono" style="text-align:right; font-weight:800; color:' + (remaining > 0 ? '#dc2626' : '#09090b') + ';">' + formatCurrency(remaining) + '</td>' +
+              '</tr>' +
+            '</tbody>' +
+          '</table>' +
+
+          '<div class="paper-summary-row">' +
+            '<div>' +
+              '<div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#52525b; font-weight:700;">Net Payable / Remaining Balance</div>' +
+              '<div class="font-mono" style="font-size:24px; font-weight:900; color:#09090b; margin-top:2px;">' + formatCurrency(remaining) + ' PKR</div>' +
+            '</div>' +
+            '<div class="stamp-box ' + stampClass + '">' + escapeHtml(stampText) + '</div>' +
+          '</div>' +
+
+          '<div class="paper-footer">' +
+            '<div>' +
+              '<strong style="display:block; color:#09090b; font-size:13px;">Thank you for your payment!</strong>' +
+              '<span style="font-size:11px; color:#52525b;">Computer-verified receipt &middot; Keep for your records</span>' +
+            '</div>' +
+            '<div class="sig-line">' +
+              '<div></div>' +
+              '<span style="font-size:11px; font-weight:700; color:#18181b;">Authorized Admin Signature</span>' +
+            '</div>' +
+          '</div>';
+
+        els.printInvoiceModal.classList.remove('hidden');
+      }
+
+      // =========================================================================
+      // CREATE INVOICE & PAYMENT ACTIONS
+      // =========================================================================
+      function openCreateModal() {
+        var today = new Date().toISOString().split('T')[0];
+        els.newDueDate.value = today;
+        els.createInvoiceModal.classList.remove('hidden');
+      }
+
+      function openPaymentModal(invoiceId) {
+        var inv = safeReadInvoices().find(function (i) { return i.id === invoiceId; });
+        if (!inv) return;
+        els.payInvoiceId.value = inv.id;
+        els.payAmountInput.value = String(inv.paidAmount);
+        els.payAmountInput.max = String(inv.totalAmount);
+        els.payInvoiceSummary.innerHTML =
+          '<strong>' + escapeHtml(inv.studentName) + '</strong> (' + escapeHtml(inv.id) + ') &middot; Total Fee: <strong class="font-mono">' + formatCurrency(inv.totalAmount) + '</strong>';
+        els.paymentModal.classList.remove('hidden');
+      }
+
+      // =========================================================================
+      // EVENT LISTENERS
+      // =========================================================================
+      Array.prototype.forEach.call(document.querySelectorAll('.filter-tab-btn'), function (btn) {
+        btn.addEventListener('click', function () {
+          activeFilter = btn.getAttribute('data-filter') || 'All';
+          Array.prototype.forEach.call(document.querySelectorAll('.filter-tab-btn'), function (b) {
+            b.classList.remove('active-all', 'active-paid', 'active-pending', 'active-partial');
+          });
+          var cls =
+            activeFilter === 'Paid'
+              ? 'active-paid'
+              : activeFilter === 'Pending'
+              ? 'active-pending'
+              : activeFilter === 'Partial'
+              ? 'active-partial'
+              : 'active-all';
+          btn.classList.add(cls);
+          renderDashboard();
+        });
+      });
+
+      els.searchInput.addEventListener('input', renderDashboard);
+
+      els.paperSizeSelect.addEventListener('change', function () {
+        els.printModalCard.classList.toggle('size-a5', els.paperSizeSelect.value === 'A5');
+      });
+
+      els.closePrintModalBtn.addEventListener('click', function () {
+        els.printInvoiceModal.classList.add('hidden');
+      });
+      els.closePrintFooterBtn.addEventListener('click', function () {
+        els.printInvoiceModal.classList.add('hidden');
+      });
+      els.printNowBtn.addEventListener('click', function () {
+        window.print();
+      });
+
+      els.openAddInvoiceBtn.addEventListener('click', openCreateModal);
+      els.closeCreateModalBtn.addEventListener('click', function () { els.createInvoiceModal.classList.add('hidden'); });
+      els.cancelCreateModalBtn.addEventListener('click', function () { els.createInvoiceModal.classList.add('hidden'); });
+
+      els.createInvoiceForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var invoices = safeReadInvoices();
+        var maxNum = 0;
+        invoices.forEach(function (i) {
+          var m = String(i.id || '').match(/(\d+)$/);
+          if (m) {
+            var n = parseInt(m[1], 10);
+            if (n > maxNum) maxNum = n;
+          }
+        });
+
+        var totalAmt = Math.max(1, Number(els.newTotalAmount.value) || 5000);
+        var paidAmt = Math.min(totalAmt, Math.max(0, Number(els.newPaidAmount.value) || 0));
+
+        var newInv = {
+          id: 'INV-' + String(maxNum + 1).padStart(3, '0'),
+          studentName: els.newStudentName.value.trim(),
+          rollNo: els.newRollNo.value.trim(),
+          batch: els.newBatch.value.trim(),
+          month: els.newMonth.value.trim(),
+          totalAmount: totalAmt,
+          paidAmount: paidAmt,
+          status: deriveStatus(totalAmt, paidAmt),
+          dueDate: els.newDueDate.value
+        };
+
+        invoices.unshift(newInv);
+        safeSaveInvoices(invoices);
+        els.createInvoiceModal.classList.add('hidden');
+        els.createInvoiceForm.reset();
+        els.newMonth.value = 'November 2026';
+        renderDashboard();
+        showToast('Created ' + newInv.id + ' for ' + newInv.studentName + '.');
+      });
+
+      els.closePayModalBtn.addEventListener('click', function () { els.paymentModal.classList.add('hidden'); });
+      els.cancelPayModalBtn.addEventListener('click', function () { els.paymentModal.classList.add('hidden'); });
+
+      els.paymentForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var targetId = els.payInvoiceId.value;
+        var invoices = safeReadInvoices().map(function (inv) {
+          if (inv.id !== targetId) return inv;
+          var totalAmt = Number(inv.totalAmount || 0);
+          var paidAmt = Math.min(totalAmt, Math.max(0, Number(els.payAmountInput.value) || 0));
+          return Object.assign({}, inv, {
+            paidAmount: paidAmt,
+            status: deriveStatus(totalAmt, paidAmt)
+          });
+        });
+        safeSaveInvoices(invoices);
+        els.paymentModal.classList.add('hidden');
+        renderDashboard();
+        showToast('Updated payment for ' + targetId + '.');
+      });
+
+      // Two-click Reset Sample Data (avoids window.confirm)
+      var resetArmed = false;
+      var resetTimer = null;
+      els.resetDbBtn.addEventListener('click', function () {
+        if (!resetArmed) {
+          resetArmed = true;
+          els.resetDbBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Click Again to Reset</span>';
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(function () {
+            resetArmed = false;
+            els.resetDbBtn.innerHTML = '<i class="fa-solid fa-rotate"></i><span>Reset Sample Data</span>';
+          }, 3200);
+          return;
+        }
+        resetArmed = false;
+        clearTimeout(resetTimer);
+        els.resetDbBtn.innerHTML = '<i class="fa-solid fa-rotate"></i><span>Reset Sample Data</span>';
+        safeSaveInvoices(INITIAL_SAMPLE_INVOICES.slice());
+        renderDashboard();
+        showToast('Sample fee invoices restored in localStorage.');
+      });
+
+      window.addEventListener('storage', function (e) {
+        if (e.key === STORAGE_KEY) {
+          renderDashboard();
+        }
+      });
+
+      renderDashboard();
+    })();
+  </script>
+</body>
+</html>
